@@ -1,2 +1,10 @@
 rposting_backend/rposting_backend/__pycache__/__init__.cpython-311.pyc
 rposting_backend/rposting_backend/__pycache__/settings.cpython-311.pyc
+.env
+
+rposting_backend/rposting_backend/__pycache__/
+rposting_backend/rposting/__pycache__/
+rposting_backend/db.sqlite3
+/rposting_backend/rposting/migrations/__pycache__
+/rposting_backend/uploads
+/rposting_backend/rposting/migrations

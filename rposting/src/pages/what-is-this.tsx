@@ -3,7 +3,8 @@ import MainLayout from "../components/MainLayout";
 export default function Main() {
     return (
         <MainLayout>
-                <div class="flex flex-col flex-grow rounded-lg shadow-lg bg-white p-6 md:w-[60%] w-[90%] mt-6 mb-6">
+            <div class="flex flex-col items-center justify-center flex-grow">
+                <div class="flex flex-col rounded-lg shadow-lg bg-white p-6 md:w-[60%] w-[90%] mt-4 mb-4">
                     <h2 class="text-2xl font-bold mb-4 text-center">Mi ez?</h2>
                     <p class="text-gray-700">
                         Ez az oldal egy speciális gyűjtő oldala azoknak a kommentek, posztoknak és egyéb tartalmaknak, amelyeket a Harcosok Klubja harcosai 
@@ -19,6 +20,7 @@ export default function Main() {
                         Ezt követően a tartalom moderálásra kerül, és ha megfelel a követelményeknek, akkor felkerül az oldalra.
                     </p>
                     </div>
+            </div>
         </MainLayout>
     );
 }

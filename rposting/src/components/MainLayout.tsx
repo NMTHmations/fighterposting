@@ -22,7 +22,7 @@ export default function MainLayout(props: MainLayoutProps) {
                     <h1>
                         <a href="/">
                         <button class="text-white text-2xl font-bold hover:text-[#fd8100]">
-                            <span class="text-[#fd8100]">Figther</span> Posting
+                            <span class="text-[#fd8100]">Figther</span> Posting <span class="text-[10px]">alfa</span>
                             </button>
                             </a>
                     </h1>
