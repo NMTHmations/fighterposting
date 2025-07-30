@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinLengthValidator,FileExtensionValidator
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
 # Create your models here.
 
@@ -9,10 +10,25 @@ def user_directory_path(instance, filename):
         return f"uploads/temp/{filename}"
     return f"uploads/{instance.id}/{filename}"
 
-class Admin(models.Model):
-    id = models.AutoField(primary_key=True)
-    username = models.CharField(max_length=255,null=False)
-    password = models.CharField(validators=[MinLengthValidator(8)],null=False,max_length=255)
+class AdminManager(BaseUserManager):
+    def create_user(self,email,password,**extra_fields):
+        if not email:
+            raise ValueError("User must have an email address")
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self.db)
+    
+    def create_superuser(self,email,password,**extra_fields):
+        return self.create_user(email,password)
+
+class Admin(AbstractBaseUser, PermissionsMixin):
+    email = models.EmailField(unique=True,default="test@example.com")
+    objects = AdminManager()
+    USERNAME_FIELD = 'email'
+    
+    def __str__(self):
+        return self.email
 
 class ReviewPost(models.Model):
     id = models.AutoField(primary_key=True)

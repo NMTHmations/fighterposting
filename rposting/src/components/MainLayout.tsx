@@ -37,9 +37,11 @@ export default function MainLayout(props: MainLayoutProps) {
                             </button>
                             </div>
                             <div class="mr-2">
+                                <a href="/upload">
                             <button class="text-white px-4 py-2 hover:text-[#ff6004] hover:underline hover:decoration-3 hover:underline-offset-4">
                                 Küldj be kommentet
                             </button>
+                            </a>
                             </div>
                             <div class="mr-2">
                                 <a href="/what-is-this">
@@ -75,9 +77,11 @@ export default function MainLayout(props: MainLayoutProps) {
                             <button class="text-white px-4 py-2 hover:text-[#ff6004] hover:underline hover:decoration-3 hover:underline-offset-4">
                                 Kommentek
                             </button>
+                            <a href="/upload">
                             <button class="text-white px-4 py-2 hover:text-[#ff6004] hover:underline hover:decoration-3 hover:underline-offset-4">
                                 Küldj be kommentet
                             </button>
+                            </a>
                             <a href="/what-is-this">
                                 <button class="text-white px-4 py-2 hover:text-[#ff6004] hover:underline hover:decoration-3 hover:underline-offset-4">
                                     Mi ez?

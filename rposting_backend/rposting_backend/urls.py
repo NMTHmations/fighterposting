@@ -29,6 +29,10 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
     SpectacularRedocView,
 )
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 schema_view = get_schema_view(
     openapi.Info(title="Test API", default_version='v1'),
@@ -39,16 +43,18 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('', lambda request: redirect('swagger-ui')),
+    path('api/token/', views.AdminTokenGenerator.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/schema/swagger-ui/', views.MySwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
-    path('review-posts/', views.getReviewPosts, name='get-review-posts'),
-    path('review-posts/<slug:slug>/', views.getReviewPost, name='get-review-post'),
+    path('review-posts/', views.getReviewPosts.as_view(), name='get-review-posts'),
+    path('review-posts/<slug:slug>/', views.getReviewPost.as_view(), name='get-review-post'),
     path('posts/<slug:slug>/', views.getPost, name='get-post'),
     path('posts/', views.getAllPosts, name='get-all-posts'),
     path('review-post/', views.InsertReview.as_view(), name='insert-review'),
-    path('delete-review/<slug:slug>/', views.deleteReview, name='delete-review'),
-    path('delete-post/<slug:slug>/', views.deletePost, name='delete-post'),
+    path('delete-review/<slug:slug>/', views.deleteReview.as_view(), name='delete-review'),
+    path('delete-post/<slug:slug>/', views.deletePost.as_view(), name='delete-post'),
     path('post/', views.InsertPost.as_view(), name='insert-post'),
     path('admin/', admin.site.urls)
 ]
