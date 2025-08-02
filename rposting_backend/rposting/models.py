@@ -34,6 +34,7 @@ class ReviewPost(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(null=False,max_length=255,default=str)
     image_source = models.FileField(upload_to=user_directory_path,null=True,validators=[FileExtensionValidator(['jpg','png','jpeg','gif','webm'])])
+    posted = models.BooleanField(null=False,default=False)
     
     def __str__(self):
         return f"{self.id}/{self.image_source}: {self.comment_text}"

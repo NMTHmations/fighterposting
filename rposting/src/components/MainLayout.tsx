@@ -32,14 +32,16 @@ export default function MainLayout(props: MainLayoutProps) {
                     <>
                     <div class="flex justify-end items-center">
                             <div class="mr-2">
+                                <a href="/fights">
                             <button class="text-white px-4 py-2 hover:text-[#ff6004] hover:underline hover:decoration-3 hover:underline-offset-4">
-                                Kommentek
+                                Harcok
                             </button>
+                            </a>
                             </div>
                             <div class="mr-2">
                                 <a href="/upload">
                             <button class="text-white px-4 py-2 hover:text-[#ff6004] hover:underline hover:decoration-3 hover:underline-offset-4">
-                                Küldj be kommentet
+                                Küldj be harcot
                             </button>
                             </a>
                             </div>
@@ -74,12 +76,14 @@ export default function MainLayout(props: MainLayoutProps) {
                 { isMenuOpen() && displayWidth() <= 1024 ?
                     <div class="bg-[#30383d] w-full h-auto flex items-center w-screen">
                         <div class="md:mr-[20%] md:ml-[20%] p-2 flex flex-col w-full items-center">
+                            <a href="/fights">
                             <button class="text-white px-4 py-2 hover:text-[#ff6004] hover:underline hover:decoration-3 hover:underline-offset-4">
-                                Kommentek
+                                Harcok
                             </button>
+                            </a>
                             <a href="/upload">
                             <button class="text-white px-4 py-2 hover:text-[#ff6004] hover:underline hover:decoration-3 hover:underline-offset-4">
-                                Küldj be kommentet
+                                Küldj be harcot
                             </button>
                             </a>
                             <a href="/what-is-this">
@@ -90,7 +94,8 @@ export default function MainLayout(props: MainLayoutProps) {
                         </div>
                     </div>
                     :
-                    <></>
+                    <>
+                    </>
                 }
                 {props.children}
                 <div class="bg-[#30383d] w-full h-16 flex items-center w-screen">

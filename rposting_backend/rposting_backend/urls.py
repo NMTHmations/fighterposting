@@ -44,7 +44,7 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('', lambda request: redirect('swagger-ui')),
     path('api/token/', views.AdminTokenGenerator.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/token/refresh/', views.AdminRefreshToken.as_view(), name='token_refresh'),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/swagger-ui/', views.MySwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
@@ -56,7 +56,9 @@ urlpatterns = [
     path('delete-review/<slug:slug>/', views.deleteReview.as_view(), name='delete-review'),
     path('delete-post/<slug:slug>/', views.deletePost.as_view(), name='delete-post'),
     path('post/', views.InsertPost.as_view(), name='insert-post'),
-    path('admin/', admin.site.urls)
+    path('admin/', admin.site.urls),
+    path('modify-title/',views.modifyTitle.as_view(),name="modify-title"),
+    path('get-recommended/',views.getRecommended,name="modify-title")
 ]
 
 if settings.DEBUG:  # Only for development
