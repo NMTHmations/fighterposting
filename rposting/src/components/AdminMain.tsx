@@ -1,5 +1,6 @@
 import { createSignal, JSX, on, onCleanup, onMount } from "solid-js";
 import { Menu, X } from 'lucide-solid';
+import { useNavigate } from "@solidjs/router";
 
 interface MainLayoutProps {
     is_logged_in: boolean;
@@ -7,6 +8,24 @@ interface MainLayoutProps {
 }
 
 export default function MainLayout(props: MainLayoutProps) {
+
+    const navigate = useNavigate();
+
+    const LogOut = async () => {
+        const response = await fetch(import.meta.env.VITE_LOGOUT, {
+            method: "DELETE",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        console.log(response.text());
+        if (response.ok) {
+            navigate("/admin");
+        } else {
+            alert("Failed to log out");
+        }
+    };
 
     return (
         <div class="flex flex-col items-center min-h-screen bg-gray-100 z-10">
@@ -23,7 +42,7 @@ export default function MainLayout(props: MainLayoutProps) {
                             <>
                             <div class="flex justify-end items-center">
                                 <a href="/admin/main"><button class="text-white px-4 py-2 hover:text-[#ff6004] hover:underline hover:decoration-3 hover:underline-offset-4">Admin Panel</button></a>
-                                <button class="text-white bg-[#ff6004] hover:bg-[#df5200] rounded-lg px-4 py-2 justify-end">Kijelentkezés</button>
+                                <button class="text-white bg-[#ff6004] hover:bg-[#df5200] rounded-lg px-4 py-2 justify-end" onclick={LogOut}>Kijelentkezés</button>
                             </div>
                             </>
                             }

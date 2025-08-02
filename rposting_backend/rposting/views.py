@@ -335,3 +335,19 @@ class modifyTitle(APIView):
             return Response({"message":"ok"},status=status.HTTP_200_OK)
         except:
             return Response({"message":"Error happened!"},status=status.HTTP_404_NOT_FOUND)
+
+class LogOut(APIView):
+    permission_classes = [IsAuthenticated]
+    def delete(self,request):
+        response = Response({"message":"Logged out!"},status=status.HTTP_200_OK)
+        response.delete_cookie(
+            'access_token',
+            samesite='Strict',
+            path='/'
+        )
+        response.delete_cookie(
+            'refresh_token',
+            samesite='Strict' or "Lax",
+            path='/'
+        )
+        return response

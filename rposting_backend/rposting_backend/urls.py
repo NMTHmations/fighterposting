@@ -58,7 +58,8 @@ urlpatterns = [
     path('post/', views.InsertPost.as_view(), name='insert-post'),
     path('admin/', admin.site.urls),
     path('modify-title/',views.modifyTitle.as_view(),name="modify-title"),
-    path('get-recommended/',views.getRecommended,name="modify-title")
+    path('get-recommended/',views.getRecommended,name="modify-title"),
+    path('logout/',views.LogOut.as_view(),name="LogOut")
 ]
 
 if settings.DEBUG:  # Only for development
