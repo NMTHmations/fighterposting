@@ -115,24 +115,24 @@ export default function Main() {
                             <h2 class="text-2xl font-bold mb-4 text-center">Várakozásra váró küzdelmek</h2>
                             <div class="flex flex-row justify-between items-center ">
                             { getPage() > 1 ?
-                                <button class="px-4 py-2 hover:text-[#ff6004] hover:underline hover:decoration-3 hover:underline-offset-4" onClick={() => setPage(getPage() - 1)}>
-                                    {getPage() - 1}
-                                </button>
-                                :
-                                <>
-                                <div class="grow"></div>
-                                </>
-                            }
-                            <p>{getPage()}</p>
-                            { getPage() !== data().length ?
-                                <button class="text-white px-4 py-2 hover:text-[#ff6004] hover:underline hover:decoration-3 hover:underline-offset-4" onClick={() => setPage(getPage() - 1)}>
-                                    {getPage() + 1}
-                                </button>
-                            :
-                            <>
-                                <div class="grow"></div>
-                            </>
-                            }
+                                            <button class="px-4 py-2 hover:text-[#ff6004] hover:underline hover:decoration-3 hover:underline-offset-4" onClick={() => setPage(getPage() - 1)}>
+                                            {getPage() - 1}
+                                            </button>
+                                        :
+                                        <>
+                                        <div class="gap"></div>
+                                        </>
+                                        }
+                                        <p>{getPage()}</p>
+                                        { getPage() !== data().length ?
+                                            <button class="px-4 py-2 hover:text-[#ff6004] hover:underline hover:decoration-3 hover:underline-offset-4" onClick={() => setPage(getPage() + 1)}>
+                                            {getPage() + 1}
+                                            </button>
+                                        :
+                                        <>
+                                        <div class="gap"></div>
+                                        </>
+                                        }
                                 </div>
                             </div>
                             <For each={data()[getPage() - 1]}>
@@ -167,24 +167,24 @@ export default function Main() {
                                 <div class="flex flex-col rounded-lg shadow-lg bg-white p-6 w-[90%] min-w-[300px] md:w-[60%] md:min-w-[400px] mb-6">
                                 <div class="flex flex-row justify-between items-center ">
                                     { getPage() > 1 ?
-                                        <button class="px-4 py-2 hover:text-[#ff6004] hover:underline hover:decoration-3 hover:underline-offset-4" onClick={() => setPage(getPage() - 1)}>
+                                            <button class="px-4 py-2 hover:text-[#ff6004] hover:underline hover:decoration-3 hover:underline-offset-4" onClick={() => setPage(getPage() - 1)}>
                                             {getPage() - 1}
-                                        </button>
+                                            </button>
                                         :
                                         <>
-                                            <div class="grow"></div>
+                                        <div class="gap"></div>
                                         </>
-                                    }
-                                    <p>{getPage()}</p>
-                                    { getPage() !== data().length ?
-                                        <button class="text-white px-4 py-2 hover:text-[#ff6004] hover:underline hover:decoration-3 hover:underline-offset-4" onClick={() => setPage(getPage() - 1)}>
+                                        }
+                                        <p>{getPage()}</p>
+                                        { getPage() !== data().length ?
+                                            <button class="px-4 py-2 hover:text-[#ff6004] hover:underline hover:decoration-3 hover:underline-offset-4" onClick={() => setPage(getPage() + 1)}>
                                             {getPage() + 1}
-                                        </button>
-                                    :
+                                            </button>
+                                        :
                                         <>
-                                            <div class="grow"></div>
+                                        <div class="gap"></div>
                                         </>
-                                    }
+                                        }
                                         </div>
                                 </div>
                         </Show>
