@@ -10,8 +10,10 @@ const fetchReviews = async () => {
 };
 
 export default function Main() {
+
     const [data] = createResource(fetchReviews);
     const [getPage, setPage] = createSignal(1);
+
     return (
         <MainLayout>
             <div class="flex flex-col items-center justify-center flex-grow">
@@ -41,17 +43,17 @@ export default function Main() {
                                             </button>
                                         :
                                         <>
-                                        <div class="grow"></div>
+                                        <div class="gap"></div>
                                         </>
                                         }
                                         <p>{getPage()}</p>
                                         { getPage() !== data().length ?
-                                            <button class="text-white px-4 py-2 hover:text-[#ff6004] hover:underline hover:decoration-3 hover:underline-offset-4" onClick={() => setPage(getPage() - 1)}>
+                                            <button class="px-4 py-2 hover:text-[#ff6004] hover:underline hover:decoration-3 hover:underline-offset-4" onClick={() => setPage(getPage() + 1)}>
                                             {getPage() + 1}
                                             </button>
                                         :
                                         <>
-                                        <div class="grow"></div>
+                                        <div class="gap"></div>
                                         </>
                                         }
                                         </div>
@@ -59,8 +61,8 @@ export default function Main() {
                                     <For each={data()[getPage() - 1]}>
                                                 {(fight) => (
                                                     <div class="flex flex-col rounded-lg shadow-lg bg-white p-4 w-[90%] min-w-[300px] md:w-[60%] md:min-w-[400px] mb-6">
-                                                        <h3 class="text-xl font-semibold mb-3">{fight.title}</h3>
-                                                        <p class="mb-2"><img src={"http://127.0.0.1:8000/"+fight.image_source}></img></p>
+                                                        <a href={`/fight/${fight.id}`}><h3 class="text-xl font-semibold mb-3">{fight.title}</h3></a>
+                                                        <p class="mb-2"><a href={`/fight/${fight.id}`}><img src={"http://127.0.0.1:8000/"+fight.image_source} class="rounded-lg shadow-lg w-full h-auto mb-1"></img></a></p>
                                                     </div>
                                                 )}
                                     </For>
@@ -72,17 +74,17 @@ export default function Main() {
                                             </button>
                                         :
                                         <>
-                                        <div class="grow"></div>
+                                        <div class="gap"></div>
                                         </>
                                         }
                                         <p>{getPage()}</p>
                                         { getPage() !== data().length ?
-                                            <button class="text-white px-4 py-2 hover:text-[#ff6004] hover:underline hover:decoration-3 hover:underline-offset-4" onClick={() => setPage(getPage() - 1)}>
+                                            <button class="px-4 py-2 hover:text-[#ff6004] hover:underline hover:decoration-3 hover:underline-offset-4" onClick={() => setPage(getPage() + 1)}>
                                             {getPage() + 1}
                                             </button>
                                         :
                                         <>
-                                        <div class="grow"></div>
+                                        <div class="gap"></div>
                                         </>
                                         }
                                         </div>

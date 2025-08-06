@@ -11,6 +11,8 @@ const Reviews = lazy(() => import('./pages/admin_panel/reviews'));
 const fights = lazy(() => import('./pages/fights'));
 const Posts = lazy(() => import('./pages/admin_panel/posts'));
 const Settings = lazy(() => import('./pages/admin_panel/settings'));
+const fight = lazy(() => import('./pages/fight'))
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 export default function App() {
   return (
@@ -25,6 +27,8 @@ export default function App() {
       <Route path="/admin/posts" component={Posts} />
       <Route path="/admin/settings" component={Settings} />
       <Route path="/fights" component={fights} />
+      <Route path="/fight/:slug" component={fight} />
+      <Route path="/*all" component={NotFound} />
     </Router>
   );
 }

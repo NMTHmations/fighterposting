@@ -100,7 +100,7 @@ export default function MainLayout(props: MainLayoutProps) {
                 {props.children}
                 <div class="bg-[#30383d] w-full h-16 flex items-center w-screen">
                     <div class="md:mr-[20%] md:ml-[20%] p-2 flex flex-row w-full items-center">
-                        <p class="text-white pl-5">Copyright text</p>
+                        <p class="text-white pl-5">Copyright &#169; {new Date().getFullYear()} FighterPosting</p>
                     </div>
                 </div>
         </div>

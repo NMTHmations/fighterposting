@@ -1,12 +1,26 @@
-import { createSignal } from "solid-js";
+import { createSignal, onMount } from "solid-js";
 import MainLayout from "../components/MainLayout";
 import { useNavigate } from "@solidjs/router";
+
+// Add grecaptcha to the Window interface for TypeScript
+declare global {
+    interface Window {
+        grecaptcha?: {
+            ready: (cb: () => void) => void;
+            render: (container: string, options: { sitekey: string }) => void;
+            getResponse: () => string;
+        };
+    }
+}
+
 
 export default function Main() {
     const [getFile, setFile] = createSignal<File | null>(null);
     const [imageSrc, setImageSrc] = createSignal<string | null>(null);
     const [uploaded, setUploaded] = createSignal(false);
 
+    onMount(() => {
+    });
 
     const handleFileChange = (event: Event) => {
         const target = event.target as HTMLInputElement;
@@ -20,6 +34,13 @@ export default function Main() {
                 };
                 reader.readAsDataURL(file);
                 setUploaded(true);
+                if (window.grecaptcha) {
+                    window.grecaptcha.ready(() => {
+                        window.grecaptcha.render("recaptcha-container", {
+                            sitekey: import.meta.env.VITE_SITE_KEY,
+                        });
+                    });
+                }
             }
             else {
                 if (file.size > 5 * 1024 * 1024) {
@@ -41,7 +62,7 @@ export default function Main() {
 
     const navigate = useNavigate();
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         const title = (document.getElementById("title") as HTMLInputElement).value;
         if (!title || title.trim() === "") {
             alert("Kérlek, add meg a harci tevékenységet!");
@@ -56,10 +77,11 @@ export default function Main() {
         const formData = new FormData();
         formData.append("title", title);
         formData.append("file", getFile()!);
+        formData.append("g-recaptcha-response", window.grecaptcha?.getResponse() || "");
 
         fetch(import.meta.env.VITE_POST_REVIEW, {
             method: "POST",
-            body: formData,
+            body: formData
         }).then(response => {
             if (response.ok) {
                 setUploaded(false);
@@ -92,6 +114,9 @@ export default function Main() {
                     <>
                     <img src={imageSrc()!} alt="Upload Icon" class="w-[100%]"/>
                     <input type="text" placeholder="Írd le a harci tevékenységet!" class="border border-gray-300 rounded p-2 w-full mt-4 mb-2" id="title"/>
+                    <div class="overflow-auto">
+                    <div id="recaptcha-container"></div>
+                    </div>
                     <button class="bg-[#ff6004] text-white px-4 py-2 rounded hover:bg-[#df5200] w-full" onclick={handleSubmit}>Küldés</button>
                     </>
                     }

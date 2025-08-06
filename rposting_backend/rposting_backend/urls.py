@@ -59,7 +59,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('modify-title/',views.modifyTitle.as_view(),name="modify-title"),
     path('get-recommended/',views.getRecommended,name="modify-title"),
-    path('logout/',views.LogOut.as_view(),name="LogOut")
+    path('logout/',views.LogOut.as_view(),name="LogOut"),
+    path('addstar/',views.AddStar.as_view(),name="AddStar")
 ]
 
 if settings.DEBUG:  # Only for development

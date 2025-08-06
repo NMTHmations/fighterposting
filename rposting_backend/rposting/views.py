@@ -5,7 +5,6 @@ from rest_framework.response import Response
 from .models import ReviewPost, ActivePost
 from django.http import JsonResponse
 import json
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
@@ -22,6 +21,8 @@ from django_ratelimit.decorators import ratelimit
 from rest_framework import status
 import traceback
 from rest_framework_simplejwt.authentication import JWTAuthentication
+import requests
+from dotenv import dotenv_values
 
 class MySwaggerView(SpectacularSwaggerView):
     authentication_classes = [JWTAuthentication]
@@ -151,11 +152,11 @@ def getPost(request,slug):
             "image_source": active.post.image_source.url,
             "starAvg": active.starAvg
         }
-        result = json.dumps(result,ensure_ascii=False,default=str)
-        return JsonResponse(result,safe=False)
+        return Response(result,status=status.HTTP_200_OK)
+    except UnboundLocalError as e:
+        return Response(result,status=status.HTTP_404_NOT_FOUND)
     except:
-        result = json.dumps({'error': '404'},ensure_ascii=False,default=str)
-        return JsonResponse(result,safe=False)
+        return Response(result,status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(["GET"])
 def getRecommended(request):
@@ -193,7 +194,20 @@ def getAllPosts(request):
             error_details = traceback.format_exc()
             return JsonResponse({"error": error_details}, safe=False)
 
-@method_decorator(csrf_exempt, name='dispatch')
+
+def verify_captcha(token):
+    KEYS = dotenv_values()
+    secret_key = KEYS["CAPTCHA_SECRET_KEY"]
+    url = 'https://www.google.com/recaptcha/api/siteverify'
+    data = {
+        "secret": secret_key,
+        "response": token
+    }
+    response = requests.post(url,data=data)
+    result = response.json()
+    print(result)
+    return result.get("success", False)
+
 class InsertReview(APIView):
     parser_classes = [MultiPartParser, FormParser]
     
@@ -222,21 +236,30 @@ class InsertReview(APIView):
         try:
             data = request.data.get('title')
             if not data:
-                return JsonResponse(json.dumps([{'result':'Invalid request'}]),safe=False)
+                print("missing:data")
+                return Response({'result':'Invalid request'},status=status.HTTP_400_BAD_REQUEST)
             if "file" not in request.FILES:
-                return JsonResponse({'Response': 400, 'Message': 'No file provided'})
+                print("missing:file")
+                return Response({'Message': 'No file provided'},status=status.HTTP_400_BAD_REQUEST)
             file_obj = request.FILES["file"]
+            token = request.data.get("g-recaptcha-response")
+            if not token:
+                print("missing:captcha")
+                return Response({"Message":"Token error"},status=status.HTTP_401_UNAUTHORIZED)
+            if not verify_captcha(token):
+                print("missing:token")
+                return Response({"Message":"Recaptcha failed"},status=status.HTTP_400_BAD_REQUEST)
             file_extension = file_obj.name.split('.')[-1].lower()
             if file_extension not in ['jpg','jpeg','png','gif']:
                 return JsonResponse({'Response': 400, 'Message': 'Invalid file format, only jpg,png or gif allowed'})
             review = ReviewPost(title=data, image_source=file_obj, posted=False)
             review.save()
             return JsonResponse({'Response':200})
-        except:
-            return JsonResponse({'Response': 500})
-        
+        except Exception as e:
+            traceback.print_exc()
+            return Response({'Message': 'Server error'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-@method_decorator(csrf_exempt, name='dispatch')
+
 class InsertPost(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
@@ -295,7 +318,7 @@ class deleteReview(APIView):
         except:
             return JsonResponse({'Response': 500})
 
-@method_decorator(csrf_exempt, name='dispatch')
+
 class modifyTitle(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
@@ -339,15 +362,75 @@ class modifyTitle(APIView):
 class LogOut(APIView):
     permission_classes = [IsAuthenticated]
     def delete(self,request):
-        response = Response({"message":"Logged out!"},status=status.HTTP_200_OK)
-        response.delete_cookie(
-            'access_token',
-            samesite='Strict',
-            path='/'
-        )
-        response.delete_cookie(
-            'refresh_token',
-            samesite='Strict' or "Lax",
-            path='/'
-        )
-        return response
+        try:
+            response = Response({"message":"Logged out!"},status=status.HTTP_200_OK)
+            response.delete_cookie(
+                'access_token',
+                samesite='Strict',
+                path='/'
+            )
+            response.delete_cookie(
+                'refresh_token',
+                samesite='Strict' or "Lax",
+                path='/'
+            )
+            return response
+        except:
+            return Response({"message":"Error Happened!"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class AddStar(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    
+    @extend_schema(
+        request={
+            'multipart/form-data': {
+                'type': 'object',
+                'properties': {
+                    'id': {
+                        'type': 'string',
+                        'description': 'id of string',
+                        'default': '1'
+                    },
+                    'star': {
+                        'type': 'string',
+                        'description': 'Number of deserved star',
+                        'default': '1'
+                    }
+                },
+                'required': ['id', 'star']
+            }
+        },
+        responses={200: OpenApiResponse(description='Patch success')}
+    )
+    def patch(self,request):
+        if getattr(request, 'limited', False):
+            return Response(
+                {"detail": "Too many rate attempts."},
+                status=status.HTTP_429_TOO_MANY_REQUESTS
+            )
+        try:
+            print("REQUEST DATA:", request.data)
+            id = request.data.get('id')
+            if not id:
+                return Response({"message":"Error happened!"},status=status.HTTP_400_BAD_REQUEST)
+            post = ActivePost.objects.get(id=id)
+            star = int(request.data.get('star'))
+            if not star:
+                return Response({"message":"Error happened!"},status=status.HTTP_400_BAD_REQUEST)
+            if star == 1:
+                post.oneStar += 1
+            elif star == 2:
+                post.twoStar += 1
+            elif star == 3:
+                post.threeStar += 1
+            elif star == 4:
+                post.fourStar += 1
+            elif star == 5:
+                post.fiveStar += 1
+            else:
+                return Response({"message":"Error happened!"},status=status.HTTP_400_BAD_REQUEST)
+            post.starAvg = ((post.oneStar * 1) + (post.twoStar * 2) + (post.threeStar * 3) + (post.fourStar * 4) + (post.fiveStar * 5)) / (post.oneStar + post.twoStar + post.threeStar + post.fourStar + post.fiveStar)
+            post.save()
+            return Response({'message':'Successful modification'},status=status.HTTP_200_OK)
+        except:
+            return Response({'message':'Post not found!'},status=status.HTTP_404_NOT_FOUND)
