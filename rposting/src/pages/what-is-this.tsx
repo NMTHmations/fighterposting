@@ -8,7 +8,7 @@ export default function Main() {
                 <div class="flex flex-col rounded-lg shadow-lg bg-white p-6 md:w-[60%] w-[90%] mt-4 mb-4">
                     <h2 class="text-2xl font-bold mb-4 text-center">Mi ez?</h2>
                     <p class="text-gray-700">
-                        Ez az oldal egy speciális gyűjtő oldala azoknak a kommentek, posztoknak és egyéb tartalmaknak, amelyeket a Harcosok Klubja harcosai 
+                        Ez az oldal egy speciális gyűjtő oldala azoknak a kommenteknek, posztoknak és egyéb tartalmaknak, amelyeket a Harcosok Klubja harcosai 
                         vagy a Digitális Polgári Körök polgárai osztottak meg a nagyvilággal, sokszor vicces, 
                         néhányszor arcpirító módon. A projekt célja az, hogy az oldal egyfajta görbe tükröt mutasson, 
                         hogy a tevékenységük és kampány stratégiájuk inkább hasonlít egy elbaszott South Park epizódra, 

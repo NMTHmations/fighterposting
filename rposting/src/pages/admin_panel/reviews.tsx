@@ -69,7 +69,7 @@ export default function Main() {
             body: formData
         });
         if (response.ok) {
-            alert("Post added successfully");
+            alert("Post modified successfully");
             refetch();
         } else {
             alert("Failed to modify the post's title");
