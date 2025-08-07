@@ -1,5 +1,6 @@
 import { Show, For, createResource, createSignal } from "solid-js";
 import MainLayout from "../components/MainLayout";
+import orange from "../img/orange.webp";
 
 const fetchReviews = async () => {
   const response = await fetch(import.meta.env.VITE_POSTS_URL);
@@ -63,6 +64,10 @@ export default function Main() {
                                                     <div class="flex flex-col rounded-lg shadow-lg bg-white p-4 w-[90%] min-w-[300px] md:w-[60%] md:min-w-[400px] mb-6">
                                                         <a href={`/fight/${fight.id}`}><h3 class="text-xl font-semibold mb-3">{fight.title}</h3></a>
                                                         <p class="mb-2"><a href={`/fight/${fight.id}`}><img src={"http://127.0.0.1:8000/"+fight.image_source} class="rounded-lg shadow-lg w-full h-auto mb-1"></img></a></p>
+                                                        <div class="flex flex-row items-center gap-x-2 mb-2">
+                                                            <img src={orange} class="w-[10%]" />
+                                                            <p class="text-gray-700 text-xl font-bold">{fight.starAvg}/5</p>
+                                                        </div>
                                                     </div>
                                                 )}
                                     </For>
