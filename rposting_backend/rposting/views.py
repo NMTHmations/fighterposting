@@ -23,56 +23,71 @@ import traceback
 from rest_framework_simplejwt.authentication import JWTAuthentication
 import requests
 from dotenv import dotenv_values
+from django.views.decorators.cache import never_cache
+import math
 
 class MySwaggerView(SpectacularSwaggerView):
     authentication_classes = [JWTAuthentication]
 
 # Before deployment: set secure to True from False
 
+@method_decorator(never_cache, name='dispatch')
 @method_decorator(ratelimit(key='ip', rate='1/10m',  method='POST', block=False), name='dispatch')
 class AdminTokenGenerator(TokenObtainPairView):
     serializer_class = AdminTokenObtainPairSerializer
     
     def post(self, request: Request, *args, **kwargs) -> Response:
-        if getattr(request, 'limited', False):
-            return Response(
-                {"detail": "Too many login attempts."},
-                status=status.HTTP_429_TOO_MANY_REQUESTS
-            )
-        serializer = self.get_serializer(data=request.data)
+        try:
+            if getattr(request, 'limited', False):
+                return Response(
+                    {"detail": "Too many login attempts."},
+                    status=status.HTTP_429_TOO_MANY_REQUESTS
+                )
+        
+            serializer = self.get_serializer(data=request.data)
+        except Exception as e:
+            traceback.print_exception()
+            print(e.__traceback__.__str__)
+            return Response({'Message':'Error happened!'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         try:
             serializer.is_valid(raise_exception=True)
         except Exception as e:
             raise InvalidToken(e.args[0]) from e
         
-        refresh = serializer.validated_data.get('refresh')
-        access = serializer.validated_data.get('access')
+        try:
+            refresh = serializer.validated_data.get('refresh')
+            access = serializer.validated_data.get('access')
         
-        response = Response(serializer.validated_data, status=status.HTTP_200_OK)
+            response = Response(serializer.validated_data, status=status.HTTP_200_OK)
         
-        response.set_cookie(
-            key='access_token',
-            value=access,
-            httponly=True,
-            secure=False,
-            samesite='Strict' or "Lax",
-            max_age=600,
-            path='/'
-        )
+            response.set_cookie(
+                key='access_token',
+                value=access,
+                httponly=True,
+                secure=False,
+                samesite='Strict' or "Lax",
+                max_age=600,
+                path='/'
+            )
         
-        response.set_cookie(
-            key='refresh_token',
-            value=refresh,
-            httponly=True,
-            secure=False,
-            samesite='Strict' or "Lax",
-            max_age=600,
-            path='/'
-        )
+            response.set_cookie(
+                key='refresh_token',
+                value=refresh,
+                httponly=True,
+                secure=False,
+                samesite='Strict' or "Lax",
+                max_age=600,
+                path='/'
+            )
 
-        return response
+            return response
+        except Exception as e:
+            traceback.print_exception()
+            print(e.__traceback__.__str__)
+            return Response({'Message':'Error happened!'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+@method_decorator(never_cache, name='dispatch')
 class AdminRefreshToken(TokenRefreshView):
     serializer_class = TokenRefreshSerializer
     
@@ -150,7 +165,7 @@ def getPost(request,slug):
             "id": active.id,
             "title": active.post.title,
             "image_source": active.post.image_source.url,
-            "starAvg": active.starAvg
+            "starAvg": round(active.starAvg,1)
         }
         return Response(result,status=status.HTTP_200_OK)
     except UnboundLocalError as e:
@@ -182,7 +197,7 @@ def getAllPosts(request):
                     "id": actives[i].id,
                     "title": actives[i].post.title,
                     "image_source": actives[i].post.image_source.url,
-                    "starAvg": actives[i].starAvg
+                    "starAvg": round(actives[i].starAvg,1)
                 }
                 partialList.append(item)
                 if (i + 1) % 10 == 0 or i == len(actives) - 1:
@@ -294,6 +309,7 @@ class InsertPost(APIView):
         except:
             return JsonResponse({'Response': 500})
 
+
 class deletePost(APIView):
     permission_classes = [IsAuthenticated]
     def delete(self,request, slug):
@@ -306,6 +322,7 @@ class deletePost(APIView):
             return JsonResponse({'Response':200})
         except:
             return JsonResponse({'Response': 500})
+
 
 class deleteReview(APIView):
     permission_classes = [IsAuthenticated]

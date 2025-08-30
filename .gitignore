@@ -8,3 +8,4 @@ rposting_backend/db.sqlite3
 /rposting_backend/rposting/migrations/__pycache__
 /rposting_backend/uploads
 /rposting_backend/rposting/migrations
+.DS_Store

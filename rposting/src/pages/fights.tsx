@@ -35,7 +35,7 @@ export default function Main() {
                                 </div>
                                 </>
                                 }>
-                                    <div class="flex flex-col rounded-lg shadow-lg bg-white p-6 w-[90%] min-w-[300px] md:w-[60%] md:min-w-[400px] mt-4 mb-6">
+                                    <div class="flex flex-col md:rounded-lg shadow-lg bg-white p-6 w-[100%] min-w-[300px] md:w-[60%] md:min-w-[400px] mt-4 mb-6">
                                         <h2 class="text-2xl font-bold mb-4 text-center">Csaták</h2>
                                         <div class="flex flex-row justify-between items-center ">
                                         { getPage() > 1 ?
@@ -61,9 +61,9 @@ export default function Main() {
                                     </div>
                                     <For each={data()[getPage() - 1]}>
                                                 {(fight) => (
-                                                    <div class="flex flex-col rounded-lg shadow-lg bg-white p-4 w-[90%] min-w-[300px] md:w-[60%] md:min-w-[400px] mb-6">
-                                                        <a href={`/fight/${fight.id}`}><h3 class="text-xl font-semibold mb-3">{fight.title}</h3></a>
-                                                        <p class="mb-2"><a href={`/fight/${fight.id}`}><img src={"http://127.0.0.1:8000/"+fight.image_source} class="rounded-lg shadow-lg w-full h-auto mb-1"></img></a></p>
+                                                    <div class="flex flex-col md:rounded-lg shadow-lg bg-white w-[100%] min-w-[300px] md:w-[60%] md:p-4 md:min-w-[400px] mb-6">
+                                                        <a href={`/fight/${fight.id}`}><h3 class="text-xl font-semibold m-4 md:m-0 md:mb-3">{fight.title}</h3></a>
+                                                        <p class="mb-2"><a href={`/fight/${fight.id}`}><img src={"http://127.0.0.1:8000/"+fight.image_source} class="md:rounded-lg md:shadow-lg w-full h-auto mb-1"></img></a></p>
                                                         <div class="flex flex-row items-center gap-x-2 mb-2">
                                                             <img src={orange} class="w-[10%]" />
                                                             <p class="text-gray-700 text-xl font-bold">{fight.starAvg}/5</p>
@@ -71,7 +71,7 @@ export default function Main() {
                                                     </div>
                                                 )}
                                     </For>
-                                    <div class="flex flex-col rounded-lg shadow-lg bg-white p-6 w-[90%] min-w-[300px] md:w-[60%] md:min-w-[400px] mb-6">
+                                    <div class="flex flex-col md:rounded-lg shadow-lg bg-white p-6 w-[100%] min-w-[300px] md:w-[60%] md:min-w-[400px] mb-6">
                                         <div class="flex flex-row justify-between items-center ">
                                         { getPage() > 1 ?
                                             <button class="px-4 py-2 hover:text-[#ff6004] hover:underline hover:decoration-3 hover:underline-offset-4" onClick={() => setPage(getPage() - 1)}>

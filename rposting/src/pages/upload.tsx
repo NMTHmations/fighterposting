@@ -1,4 +1,4 @@
-import { createSignal, onMount } from "solid-js";
+import { createSignal, onMount, Show } from "solid-js";
 import MainLayout from "../components/MainLayout";
 import { useNavigate } from "@solidjs/router";
 
@@ -18,6 +18,7 @@ export default function Main() {
     const [getFile, setFile] = createSignal<File | null>(null);
     const [imageSrc, setImageSrc] = createSignal<string | null>(null);
     const [uploaded, setUploaded] = createSignal(false);
+    const [isUploading, setIsUploading] = createSignal(false);
 
     onMount(() => {
     });
@@ -79,6 +80,8 @@ export default function Main() {
         formData.append("file", getFile()!);
         formData.append("g-recaptcha-response", window.grecaptcha?.getResponse() || "");
 
+        setIsUploading(true);
+
         fetch(import.meta.env.VITE_POST_REVIEW, {
             method: "POST",
             body: formData
@@ -87,12 +90,15 @@ export default function Main() {
                 setUploaded(false);
                 setFile(null);
                 setImageSrc(null);
+                setIsUploading(false);
                 navigate("/success");
             } else {
                 alert("Hiba történt a feltöltés során. Kérlek, próbáld újra.");
+                setIsUploading(false);
             }
         }).catch(() => {
             alert("Hiba történt a feltöltés során. Kérlek, próbáld újra.");
+            setIsUploading(false);
         });
         // Reset after submission
         setFile(null);
@@ -105,6 +111,8 @@ export default function Main() {
             <div class="flex flex-col items-center justify-center flex-grow">
                 <div class="flex flex-col rounded-lg shadow-lg bg-white p-6 w-[90%] min-w-[300px] md:w-[60%] md:min-w-[400px] mt-4 mb-4">
                     <h2 class="text-2xl font-bold mb-4 text-center">Harcos harcának feltöltése</h2>
+                    <Show when={!isUploading()} fallback={
+                        <p class="mb-2">Feltöltés...</p>}>
                     { uploaded() == false ?
                     <>
                     <input type="file" id="file-upload" class="hidden" onChange={handleFileChange}/>
@@ -120,6 +128,7 @@ export default function Main() {
                     <button class="bg-[#ff6004] text-white px-4 py-2 rounded hover:bg-[#df5200] w-full" onclick={handleSubmit}>Küldés</button>
                     </>
                     }
+                    </Show>
                     </div>
             </div>
         </MainLayout>

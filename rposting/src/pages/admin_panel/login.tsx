@@ -14,7 +14,6 @@ export default function Main() {
                 },
                 body: JSON.stringify({})
             });
-            console.log(await res.json());
             if (res.status === 200) {
                 navigate("/admin/main");
             }
@@ -39,8 +38,15 @@ export default function Main() {
                                             }),
                     });
         if (!response.ok) {
-            const data = await response.json();
-            setError(data.detail);
+            const raw = await response.text(); // read once
+            let message = `Error ${response.status}`;
+            try {
+            const data = JSON.parse(raw); // attempt JSON parse
+            message = data.detail || message;
+            } catch {
+            console.error('Non-JSON error body:', raw);
+            }
+            setError(message);
         }
         else {
             setError(null);

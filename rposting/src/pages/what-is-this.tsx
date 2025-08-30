@@ -44,7 +44,7 @@ export default function Main() {
                         <div class="flex flex-col items-center mt-2 mb-2 w-full">
                             <div class="gap-4"></div>
                             <div>
-                            <div class="rounded-2xl max-w-[500px] border-4 border-orange-500 mt-4 mb-4 p-4"><p>Fejlesztői blog (hogy ilyen förtelmes stílus elemeket mellőzzem), sötét mód</p></div>
+                            <div class="rounded-2xl max-w-[500px] border-4 border-orange-500 mt-4 mb-4 p-4"><p>Fejlesztői blog (hogy az ilyen förtelmes stílus elemeket mellőzzem), sötét mód, kategóriák, keresőoldal</p></div>
                             </div>
                             <div class="gap-4"></div>
                         </div>

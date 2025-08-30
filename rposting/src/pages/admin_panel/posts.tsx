@@ -32,7 +32,6 @@ export default function Main() {
                     },
                     body: JSON.stringify({})
                 });
-                console.log(await res.json());
                 if (res.status !== 200) {
                     navigate("/admin");
                 }
