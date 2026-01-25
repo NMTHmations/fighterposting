@@ -2,7 +2,7 @@ import random
 from django.shortcuts import render
 from rest_framework.request import Request
 from rest_framework.response import Response
-from .models import ReviewPost, ActivePost, DeviceHandler
+from .models import ReviewPost, ActivePost, DeviceHandler, FightClubTextMessages, BlogPosts
 from django.http import JsonResponse
 import json
 from rest_framework.decorators import api_view
@@ -27,7 +27,7 @@ from django.views.decorators.cache import never_cache
 import math
 import string
 from Crypto.PublicKey import RSA
-from Crypto.Cipher import PKCS1_OAEP, PKCS1_v1_5
+from Crypto.Cipher import PKCS1_OAEP
 import base64
 import jwt
 import datetime
@@ -548,3 +548,148 @@ class EdgeToolTokenGet(APIView):
                 return Response({'message':'Device not found!'},status=status.HTTP_404_NOT_FOUND)
         except:
             return Response({'message':'Unexpected server error happened during query'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(["POST"])
+def CronAddSocialRaid(request):
+    try:
+        auth = None
+        try:
+            auth = request.headers.get("Authorization")
+            if not str(auth).startswith("Bearer "):
+                return Response({'message':'Authentication failed'},status=status.HTTP_403_FORBIDDEN)
+        except:
+            return Response({'message':'Authentication failed!'},status=status.HTTP_403_FORBIDDEN)
+        
+        KEYS = dotenv_values()
+        
+        private_key_bytes = None
+        
+        with open(KEYS["PRIVATE_KEY"],"rb") as file:
+            private_key_bytes = file.read()
+        
+        token = auth[7:]
+        
+        payload = jwt.decode(token,private_key_bytes,["HS256"],options={
+            "require": ["ttl","token"]
+        })
+        tokens = DeviceHandler.objects.all()
+        found = False
+        decodedToken = decrypt_message(payload["token"],private_key_bytes)
+        for token in tokens:
+            if token.devicePAT == payload["token"] and decrypt_message(token.devicePAT,private_key_bytes) == decodedToken and token.TTL == payload["ttl"]:
+                found = True
+                break
+        if found == False:
+            return Response({'message':'Token is not found!'},status=status.HTTP_404_NOT_FOUND)
+        ttl = datetime.datetime.strptime(payload["ttl"],'%Y-%m-%d')
+        if datetime.datetime.now().date() > ttl:
+            return Response({'message':'Token expired!'},status=status.HTTP_400_BAD_REQUEST)
+        try:
+            message = str(request.data.get("message"))
+            link = str(request.data.get("link"))
+            type = str(request.data.get("type"))
+            date = datetime.datetime.strptime(request.data.get("date"),'%Y-%m-%d')
+            fightSMS = FightClubTextMessages(date=date,message=message,socialPostType=type,socialUrl=link)
+            fightSMS.save()
+            return Response({'message':'SMS message added!'},status=status.HTTP_200_OK)
+        except:
+            return Response({'message':'Bad or missing requests!'},status=status.HTTP_400_BAD_REQUEST)
+    except:
+        return Response({'message':'Unexpected server error happened during social post raid addition'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class CreateFighterSMS(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        try:
+            message = str(request.data.get("message"))
+            link = str(request.data.get("link"))
+            type = str(request.data.get("type"))
+            date = datetime.datetime.strptime(request.data.get("date"),'%Y-%m-%d')
+            fightSMS = FightClubTextMessages(date=date,message=message,socialPostType=type,socialUrl=link)
+            fightSMS.save()
+            return Response({'message':'SMS message added!'},status=status.HTTP_200_OK)
+        except:
+            return Response({'message':'Bad or missing requests!'},status=status.HTTP_400_BAD_REQUEST)
+
+class DeleteFighterSMS(APIView):
+    def delete(self, request,slug):
+        try:
+            fightSMS = FightClubTextMessages.objects.get(id=slug)
+            fightSMS.delete()
+            return Response({'message':'SMS message added!'},status=status.HTTP_200_OK)
+        except:
+            return Response({'message':'Bad or missing requests!'},status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(["GET"])
+def getFighterSMS(request):
+    try:
+        fighterSMSmessages = FightClubTextMessages.objects.order_by("-id")
+        partialList = []
+        for SMS in fighterSMSmessages:
+            elem = {
+                "id": SMS.id,
+                "message": SMS.message,
+                "date": f"{SMS.date.year}-{SMS.date.month}-{SMS.date.day}",
+                "linkType": SMS.socialPostType,
+                "link": SMS.socialUrl
+            }
+            partialList.append(elem)
+        return Response(partialList,status=status.HTTP_200_OK)
+    except:
+        return Response({'message':'Error happened!'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class AddBlogPost(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self,request):
+        try:
+            title = request.data.get("title")
+            post = request.data.get("post")
+            blogPost = BlogPosts(title=title,post=post)
+            blogPost.save()
+            return Response({'message':'Blogpost created!'},status=status.HTTP_200_OK)
+        except:
+            return Response({'message':'Error happened during the creation of blogposts'},status=status.HTTP_400_BAD_REQUEST)
+
+class DeleteBlogPost(APIView):
+    permission_classes = [IsAuthenticated]
+    def delete(self,request,slug):
+        try:
+            blogpost = BlogPosts.objects.all().get(id=slug)
+            blogpost.delete()
+            return Response({'message':'Post deleted successfully'},status=status.HTTP_200_OK)
+        except:
+            return Response({'message':'Post not found'},status=status.HTTP_404_NOT_FOUND)
+
+@api_view(["GET"])
+def getAllBlogPosts(request):
+    try:
+        blogposts = BlogPosts.objects.order_by("-id")
+        partialList = []
+        for post in blogposts:
+            elem = {
+                "id": post.id,
+                "title": post.title,
+                "post": post.post,
+                "date": post.date
+            }
+            partialList.append(elem)
+        return Response(partialList,status=status.HTTP_200_OK)
+    except:
+        return Response({'message':'Error happened!'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(["GET"])
+def getBlogPost(request, slug):
+    try:
+        blogpost = BlogPosts.objects.all().get(id=slug)
+        result = {
+            "id": blogpost.id,
+            "title": blogpost.title,
+            "post": blogpost.post,
+            "date": f"{blogpost.date.year}-{blogpost.date.month}-{blogpost.date.day} {blogpost.date.hour}:{blogpost.date.min}"
+        }
+        return Response(result,status=status.HTTP_200_OK)
+    except:
+        return Response({'message':'Blog post does not exist!'},status=status.HTTP_404_NOT_FOUND)
+
+

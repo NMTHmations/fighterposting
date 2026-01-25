@@ -74,3 +74,4 @@ class BlogPosts(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=128, null=False)
     post = models.TextField(null=False,max_length=3000)
+    date = models.DateTimeField(default=now())

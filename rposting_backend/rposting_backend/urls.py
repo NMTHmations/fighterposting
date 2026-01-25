@@ -61,9 +61,17 @@ urlpatterns = [
     path('get-recommended/',views.getRecommended,name="modify-title"),
     path('logout/',views.LogOut.as_view(),name="LogOut"),
     path('addstar/',views.AddStar.as_view(),name="AddStar"),
-    path('deviceToken/<slug:slug>/',views.EdgeToolTokenGet.as_view(),name="get-device-token"),
-    path('deviceToken/delete/<slug:slug>/',views.EdgeToolTokenDelete.as_view(),name="delete-device-token"),
-    path('deviceToken',views.EdgeToolTokenCreate.as_view(),name="create-device-token")
+    path('devicetoken/<slug:slug>/',views.EdgeToolTokenGet.as_view(),name="get-device-token"),
+    path('devicetoken/delete/<slug:slug>/',views.EdgeToolTokenDelete.as_view(),name="delete-device-token"),
+    path('devicetoken',views.EdgeToolTokenCreate.as_view(),name="create-device-token"),
+    path('cron/addsms/',views.CronAddSocialRaid,name="cronjob-add-sms"),
+    path('fighter/sms/add/',views.CreateFighterSMS.as_view(),name="add-sms"),
+    path('fighter/sms/delete/<slug:slug>/',views.DeleteFighterSMS.as_view(),name="delete-sms"),
+    path('fighter/sms/',views.getFighterSMS,name="get-all-sms"),
+    path('blogposts/',views.getAllBlogPosts,name="get-all-blog-posts"),
+    path('blogposts/<slug:slug>/',views.getBlogPost,name="get-blog-post"),
+    path('blogposts/add/',views.AddBlogPost.as_view(),name="add-blog-post"),
+    path('blogposts/delete/<slug:slug>',views.DeleteBlogPost.as_view(),name="delete-blog-post")
 ]
 
 if settings.DEBUG:  # Only for development
