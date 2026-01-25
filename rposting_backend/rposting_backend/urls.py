@@ -60,7 +60,10 @@ urlpatterns = [
     path('modify-title/',views.modifyTitle.as_view(),name="modify-title"),
     path('get-recommended/',views.getRecommended,name="modify-title"),
     path('logout/',views.LogOut.as_view(),name="LogOut"),
-    path('addstar/',views.AddStar.as_view(),name="AddStar")
+    path('addstar/',views.AddStar.as_view(),name="AddStar"),
+    path('deviceToken/<slug:slug>/',views.EdgeToolTokenGet.as_view(),name="get-device-token"),
+    path('deviceToken/delete/<slug:slug>/',views.EdgeToolTokenDelete.as_view(),name="delete-device-token"),
+    path('deviceToken',views.EdgeToolTokenCreate.as_view(),name="create-device-token")
 ]
 
 if settings.DEBUG:  # Only for development

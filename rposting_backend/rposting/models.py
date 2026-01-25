@@ -1,6 +1,8 @@
 from django.db import models
 from django.core.validators import MinLengthValidator,FileExtensionValidator
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.utils.timezone import now
+import datetime
 
 # Create your models here.
 
@@ -29,6 +31,25 @@ class Admin(AbstractBaseUser, PermissionsMixin):
     
     def __str__(self):
         return self.email
+
+class DeviceHandler(models.Model):
+    id = models.AutoField(primary_key=True)
+    deviceName = models.CharField(null=False,max_length=125)
+    devicePAT = models.TextField(null=False,max_length=3000)
+    TTL = models.DateField(default=now().date())
+
+class FightClubTextMessages(models.Model):
+    id = models.AutoField(primary_key=True)
+    date = models.DateField(null=False)
+    message = models.TextField(null=False,max_length=300)
+    socialPostType = models.CharField(null=False, max_length=256,choices={
+        "TK": "TikTok",
+        "FB": "Facebook",
+        "IG": "Instagram",
+        "YT": "YouTube",
+        "TH": "Threads",
+        "X": "X"})
+    socialUrl = models.TextField(null=False,max_length=3000)
 
 class ReviewPost(models.Model):
     id = models.AutoField(primary_key=True)

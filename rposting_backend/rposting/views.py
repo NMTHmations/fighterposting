@@ -2,7 +2,7 @@ import random
 from django.shortcuts import render
 from rest_framework.request import Request
 from rest_framework.response import Response
-from .models import ReviewPost, ActivePost
+from .models import ReviewPost, ActivePost, DeviceHandler
 from django.http import JsonResponse
 import json
 from rest_framework.decorators import api_view
@@ -25,6 +25,29 @@ import requests
 from dotenv import dotenv_values
 from django.views.decorators.cache import never_cache
 import math
+import string
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_OAEP, PKCS1_v1_5
+import base64
+import jwt
+import datetime
+
+def generateRandomString(size = 64):
+        return ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for i in range(size))
+    
+
+def encrypt_message(message: str, public_key_bytes):
+    key = RSA.import_key(public_key_bytes)
+    cipher = PKCS1_OAEP.new(key)
+    encrypted = cipher.encrypt(message.encode())
+    return base64.b64encode(encrypted).decode()
+
+def decrypt_message(encoded_encrypted_msg: str, private_key_bytes):
+    key = RSA.import_key(private_key_bytes)
+    cipher = PKCS1_OAEP.new(key)
+    encrypted_bytes = base64.b64decode(encoded_encrypted_msg)
+    decrypted = cipher.decrypt(encrypted_bytes)
+    return decrypted.decode()
 
 class MySwaggerView(SpectacularSwaggerView):
     authentication_classes = [JWTAuthentication]
@@ -451,3 +474,77 @@ class AddStar(APIView):
             return Response({'message':'Successful modification'},status=status.HTTP_200_OK)
         except:
             return Response({'message':'Post not found!'},status=status.HTTP_404_NOT_FOUND)
+
+class EdgeToolTokenDelete(APIView):
+    permission_classes = [IsAuthenticated]
+    def delete(self,request,slug):
+        try:
+            device = DeviceHandler.objects.get(id=slug)
+            device.delete()
+            return Response({'message':'Token deleted succesfully!'},status=status.HTTP_200_OK)
+        except:
+            return Response({'message':'Token could not be deleted!'},status=status.HTTP_404_NOT_FOUND)
+
+class EdgeToolTokenCreate(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (MultiPartParser, FormParser)
+    
+    @extend_schema(
+        request={
+            'multipart/form-data': {
+                'type': 'object',
+                'properties': {
+                    'name': {
+                        'type': 'string',
+                        'description': 'PBX device name',
+                        'default': 'PBX test'
+                    },
+                    'ttl': {
+                        'type': 'string',
+                        'description': 'Title of post',
+                        'default': '2026-04-12'
+                    }
+                },
+                'required': ['name']
+            }
+        },
+        responses={200: OpenApiResponse(description='Token created!')}
+    )
+    def post(self,request):
+        try:
+            KEYS = dotenv_values()
+            with open(KEYS["PUBLIC_KEY"],"rb") as file:
+                public_key = file.read()
+            deviceName = str(request.data.get('name'))
+            device = None
+            PAT = encrypt_message(generateRandomString(),public_key_bytes=public_key)
+            try:
+                ttl_str = request.data.get('ttl')
+                ttl = datetime.datetime.strptime(ttl_str, '%Y-%m-%d')
+                device = DeviceHandler(deviceName=deviceName,devicePAT=PAT, TTL=ttl)
+            except:
+                device = DeviceHandler(deviceName=deviceName,devicePAT=PAT)
+            device.save()
+            return Response({'message':'Token created!'},status=status.HTTP_200_OK)
+        except:
+            return Response({'message':f'Token could not be created!'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class EdgeToolTokenGet(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self,request,slug):
+        try:
+            KEYS = dotenv_values()
+            with open(KEYS["PRIVATE_KEY"],"rb") as file:
+                private_key = file.read()
+            try:
+                device = DeviceHandler.objects.get(id=slug)
+                result = {
+                    "name" : device.deviceName,
+                    "token" : decrypt_message(device.devicePAT,private_key_bytes=private_key),
+                    "ttl": device.TTL
+                }
+                return Response(result,status=status.HTTP_200_OK)
+            except:
+                return Response({'message':'Device not found!'},status=status.HTTP_404_NOT_FOUND)
+        except:
+            return Response({'message':'Unexpected server error happened during query'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
