@@ -4,6 +4,7 @@ import MainLayout from "../components/MainLayout";
 import image from "../img/orange.webp";
 import colorless from "../img/orange.png";
 import halfOrange from "../img/half_orange.png";
+import Plate from "../components/Plate";
 
 export default function Main() {
 
@@ -73,7 +74,7 @@ export default function Main() {
                                                 </div>
                                                 </>
                                                 }>
-                                                    <div class="flex flex-col md:rounded-lg shadow-lg bg-white md:p-6 w-[100%] min-w-[300px] md:w-[60%] md:min-w-[400px] mt-4 mb-4">
+                                                    <Plate type="post">
                                                         <h2 class="text-2xl font-bold mb-4 mt-4 md:mt-0 text-center">{data().title}</h2>
                                                         <img src={`http://localhost:8000${data().image_source}`} alt="Harcos" class="md:rounded-lg md:shadow-lg w-full h-auto mb-4" />
                                                         <p class="mb-4 ml-4 md:ml-0 text-lg font-semibold">Értékelés:</p>
@@ -89,7 +90,7 @@ export default function Main() {
                                                             </For>
                                                             <p class="text-lg font-semibold">{data().starAvg.toFixed(1)} / 5</p>
                                                         </div>
-                                                    </div>
+                                                    </Plate>
                                                 </Show>
             </div>
         </MainLayout>

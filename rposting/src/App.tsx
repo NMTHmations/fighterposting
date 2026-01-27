@@ -12,6 +12,7 @@ const fights = lazy(() => import('./pages/fights'));
 const Posts = lazy(() => import('./pages/admin_panel/posts'));
 const Settings = lazy(() => import('./pages/admin_panel/settings'));
 const fight = lazy(() => import('./pages/fight'))
+const SMSs = lazy(() => import('./pages/hkposts'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 export default function App() {
@@ -28,6 +29,7 @@ export default function App() {
       <Route path="/admin/settings" component={Settings} />
       <Route path="/fights" component={fights} />
       <Route path="/fight/:slug" component={fight} />
+      <Route path="/SMS" component={SMSs} />
       <Route path="/*all" component={NotFound} />
     </Router>
   );

@@ -1,0 +1,37 @@
+import { JSX } from "solid-js";
+
+interface plateProps {
+    type?: string;
+    children: JSX.Element;
+}
+
+export default function Plate(props: plateProps) {
+    return (
+        props.type === "fight" ?
+        <div class="flex flex-col md:rounded-lg shadow-lg bg-white w-[100%] min-w-[300px] md:w-[60%] md:p-4 md:min-w-[400px] mb-6">
+            {props.children}
+        </div>
+        :
+        props.type === "recommended" ?
+        <div class="flex flex-col md:rounded-lg shadow-lg bg-white pt-4 md:p-6 w-[100%] min-w-[300px] md:w-[60%] md:min-w-[400px] mt-4 mb-4">
+            {props.children}
+        </div>
+        :
+        props.type === "welcome" ?
+        <div class="flex flex-col md:rounded-lg shadow-lg bg-white p-6 w-[100%] min-w-[300px] md:w-[60%] md:min-w-[400px] mt-4 mb-4">
+            {props.children}
+        </div>
+        :
+        props.type === "small" ?
+        <div class="flex flex-col rounded-lg shadow-lg bg-white p-6 w-[90%] min-w-[300px] md:w-[60%] md:min-w-[400px] mt-4 mb-4">
+            {props.children}
+        </div>
+        :
+        props.type === "post" ?
+        <div class="flex flex-col md:rounded-lg shadow-lg bg-white md:p-6 w-[100%] min-w-[300px] md:w-[60%] md:min-w-[400px] mt-4 mb-4">
+            {props.children}
+        </div>
+        :
+        <></>
+    );
+}
