@@ -525,7 +525,8 @@ class EdgeToolTokenCreate(APIView):
             except:
                 device = DeviceHandler(deviceName=deviceName,devicePAT=PAT)
             device.save()
-            return Response({'message':'Token created!'},status=status.HTTP_200_OK)
+            return Response({'message':'Token created!',
+                             'order_no': device.id},status=status.HTTP_200_OK)
         except:
             return Response({'message':f'Token could not be created!'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -544,6 +545,29 @@ class EdgeToolTokenGet(APIView):
                     "ttl": device.TTL
                 }
                 return Response(result,status=status.HTTP_200_OK)
+            except:
+                return Response({'message':'Device not found!'},status=status.HTTP_404_NOT_FOUND)
+        except:
+            return Response({'message':'Unexpected server error happened during query'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class EdgeToolTokenGetAll(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self,request):
+        try:
+            KEYS = dotenv_values()
+            with open(KEYS["PRIVATE_KEY"],"rb") as file:
+                private_key = file.read()
+            try:
+                results = DeviceHandler.objects.all()
+                resultList = []
+                for result in results:
+                    item = {
+                        "id": result.id,
+                        "name": result.deviceName,
+                        "TTL": result.TTL
+                    }
+                    resultList.append(item)
+                return Response(resultList,status=status.HTTP_200_OK)
             except:
                 return Response({'message':'Device not found!'},status=status.HTTP_404_NOT_FOUND)
         except:
@@ -599,7 +623,39 @@ def CronAddSocialRaid(request):
 
 class CreateFighterSMS(APIView):
     permission_classes = [IsAuthenticated]
+    parser_classes = (MultiPartParser, FormParser)
     
+    @extend_schema(
+        request={
+            'multipart/form-data': {
+                'type': 'object',
+                'properties': {
+                    'message': {
+                        'type': 'string',
+                        'description': 'PBX device name',
+                        'default': 'PBX test'
+                    },
+                    'date': {
+                        'type': 'string',
+                        'description': 'Title of post',
+                        'default': '2026-04-12'
+                    },
+                    'type': {
+                        'type': 'string',
+                        'description': 'Social post type and source - Facebook, Tiktok X and etc',
+                        'default': 'FB'
+                    },
+                    'link': {
+                        'type': 'string',
+                        'description': 'Link for the post',
+                        'default': 'https://www.facebook.com/share/p/183qXeAYvN/?mibextid=wwXIfr'
+                    }
+                },
+                'required': ['message','date','type','link']
+            }
+        },
+        responses={200: OpenApiResponse(description='Token created!')}
+    )
     def post(self, request):
         try:
             message = str(request.data.get("message"))

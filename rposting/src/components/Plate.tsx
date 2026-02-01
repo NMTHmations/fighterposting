@@ -32,6 +32,11 @@ export default function Plate(props: plateProps) {
             {props.children}
         </div>
         :
+        props.type === "admin" ?
+        <div class="flex flex-col rounded-lg shadow-lg bg-white w-[90%] md:w-full md:min-w-[600px] mt-4 mb-4">
+            {props.children}
+        </div>
+        :
         <></>
     );
 }

@@ -34,7 +34,7 @@ export default function MainLayout(props: MainLayoutProps) {
                     <h1 class="flex items-center justify-between w-full">
                         <a href="/">
                         <button class="text-white text-2xl font-bold hover:text-[#fd8100]">
-                            <span class="text-[#fd8100]">Figther</span> Posting <span class="text-[10px]">alfa</span>
+                            <span class="text-[#fd8100]">Fighter</span> Posting <span class="text-[10px]">alfa</span>
                             </button>
                             </a>
                             {props.is_logged_in ? <><span class="text-white text-2xl font-bold justify-end">Admin Panel</span>

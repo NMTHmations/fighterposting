@@ -1,6 +1,7 @@
 import { createEffect, onMount } from "solid-js";
 import AdminMain from "../../components/AdminMain";
 import { useNavigate } from "@solidjs/router";
+import Plate from "../../components/Plate";
 
 export default function Main() {
     const navigate = useNavigate();
@@ -22,7 +23,7 @@ export default function Main() {
     return (
         <AdminMain is_logged_in={false}>
             <div class="z-5 flex flex-col items-center justify-center flex-grow">
-                <div class="flex flex-col rounded-lg shadow-lg bg-white w-[90%] md:w-full md:min-w-[600px] mt-4 mb-4">
+                <Plate type="admin">
                     <div class="bg-[#30383d] w-full h-16 flex items-center rounded-tl-lg rounded-tr-lg justify-center">
                     <h1 class="text-2xl text-center font-bold text-white">Menü</h1>
                     </div>
@@ -30,8 +31,12 @@ export default function Main() {
                     <a href="/admin/reviews" class="flex-1"><button class="bg-[#ff6004] text-white px-4 py-5 sm:px-2 sm:py-5 rounded hover:bg-[#df5200] w-full mt-4 mr-4">Átnézésre váró posztok</button></a>
                     <a href="/admin/posts" class="flex-1"><button class="bg-[#ff6004] text-white px-4 py-8 sm:px-2 sm:py-8 rounded hover:bg-[#df5200] w-full mt-4 mr-4">Posztok</button></a>
                     <a href="/admin/settings" class="flex-1"><button class="bg-[#ff6004] text-white px-4 py-8 sm:px-2 sm:py-8 rounded hover:bg-[#df5200] w-full mt-4">Beállítások</button></a>
+                    <a href="/admin/SMS" class="flex-1"><button class="bg-[#ff6004] text-white px-4 py-8 sm:px-2 sm:py-8 rounded hover:bg-[#df5200] w-full mt-4">SMS-ek</button></a>
                     </div>
-                </div>
+                    <div class="flex flex-row gap-4 md:min-w-[600px] pr-6 pl-6 pt-0 pb-4">
+                    <a href="/admin/blogposts" class="flex-1"><button class="bg-[#ff6004] text-white px-4 py-8 sm:px-2 sm:py-8 rounded hover:bg-[#df5200] w-full mt-4">Blog</button></a>
+                    </div>
+                </Plate>
             </div>
         </AdminMain>
     );
