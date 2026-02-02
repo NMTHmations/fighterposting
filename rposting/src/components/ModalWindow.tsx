@@ -9,7 +9,7 @@ interface ModalWindowProps {
 export default function ModalWindow(props: ModalWindowProps) {
     return (
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-            <div class="w-full max-w-md
+            <div class="w-full min-w-md max-w-xl
               rounded-lg bg-white p-6
               shadow-xl
               animate-in fade-in zoom-in-95">
