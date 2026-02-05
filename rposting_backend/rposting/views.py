@@ -697,10 +697,33 @@ def getFighterSMS(request):
 
 class AddBlogPost(APIView):
     permission_classes = [IsAuthenticated]
+    parser_classes = (MultiPartParser, FormParser)
+    
+    @extend_schema(
+        request={
+            'multipart/form-data': {
+                'type': 'object',
+                'properties': {
+                    'title': {
+                        'type': 'string',
+                        'description': 'PBX device name',
+                        'default': 'PBX test'
+                    },
+                    'post': {
+                        'type': 'string',
+                        'description': 'Title of post',
+                        'default': '2026-04-12'
+                    }
+                },
+                'required': ['title','post']
+            }
+        },
+        responses={200: OpenApiResponse(description='Post created!')}
+    )
     def post(self,request):
         try:
-            title = request.data.get("title")
-            post = request.data.get("post")
+            title = str(request.data.get("title"))
+            post = str(request.data.get("post"))
             blogPost = BlogPosts(title=title,post=post)
             blogPost.save()
             return Response({'message':'Blogpost created!'},status=status.HTTP_200_OK)
@@ -716,6 +739,43 @@ class DeleteBlogPost(APIView):
             return Response({'message':'Post deleted successfully'},status=status.HTTP_200_OK)
         except:
             return Response({'message':'Post not found'},status=status.HTTP_404_NOT_FOUND)
+
+class ModifyBlogPost(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (MultiPartParser, FormParser)
+    
+    @extend_schema(
+        request={
+            'multipart/form-data': {
+                'type': 'object',
+                'properties': {
+                    'title': {
+                        'type': 'string',
+                        'description': 'PBX device name',
+                        'default': 'PBX test'
+                    },
+                    'post': {
+                        'type': 'string',
+                        'description': 'Title of post',
+                        'default': '2026-04-12'
+                    }
+                },
+                'required': ['title','post']
+            }
+        },
+        responses={200: OpenApiResponse(description='Post created!')}
+    )
+    def patch(self, request, slug):
+        try:
+            blogpost = BlogPosts.objects.all().get(id=slug)
+            blogpost.post = str(request.data.get("post"))
+            blogpost.title = str(request.data.get("title"))
+            blogpost.date = datetime.date.today()
+            blogpost.save()
+            return Response({'message':'Post modified successfully'},status=status.HTTP_200_OK)
+        except:
+            return Response({'message':'Post not found'},status=status.HTTP_404_NOT_FOUND)
+
 
 @api_view(["GET"])
 def getAllBlogPosts(request):

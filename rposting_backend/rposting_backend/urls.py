@@ -70,9 +70,10 @@ urlpatterns = [
     path('fighter/sms/delete/<slug:slug>/',views.DeleteFighterSMS.as_view(),name="delete-sms"),
     path('fighter/sms/',views.getFighterSMS,name="get-all-sms"),
     path('blogposts/',views.getAllBlogPosts,name="get-all-blog-posts"),
-    path('blogposts/<slug:slug>/',views.getBlogPost,name="get-blog-post"),
     path('blogposts/add/',views.AddBlogPost.as_view(),name="add-blog-post"),
-    path('blogposts/delete/<slug:slug>',views.DeleteBlogPost.as_view(),name="delete-blog-post")
+    path('blogposts/<slug:slug>',views.getBlogPost,name="get-blog-post"),
+    path('blogposts/delete/<slug:slug>',views.DeleteBlogPost.as_view(),name="delete-blog-post"),
+    path('blogposts/modify/<slug:slug>',views.ModifyBlogPost.as_view(),name="modify-blog-post")
 ]
 
 if settings.DEBUG:  # Only for development

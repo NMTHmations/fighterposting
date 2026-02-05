@@ -37,6 +37,11 @@ export default function Plate(props: plateProps) {
             {props.children}
         </div>
         :
+        props.type === "blogpost_admin" ?
+        <div class="flex flex-col md:rounded-lg shadow-lg bg-white w-[100%] min-w-[800px] md:w-[60%] md:p-4 md:min-w-[800px] mb-6">
+            {props.children}
+        </div>
+        :
         <></>
     );
 }
