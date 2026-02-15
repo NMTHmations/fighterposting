@@ -76,7 +76,7 @@ export default function Main() {
                                                 }>
                                                     <Plate type="post">
                                                         <h2 class="text-2xl font-bold mb-4 mt-4 md:mt-0 text-center">{data().title}</h2>
-                                                        <img src={`http://localhost:8000${data().image_source}`} alt="Harcos" class="md:rounded-lg md:shadow-lg w-full h-auto mb-4" />
+                                                        <img src={`${import.meta.env.VITE_API_URL}${data().image_source}`} alt="Harcos" class="md:rounded-lg md:shadow-lg w-full h-auto mb-4" />
                                                         <p class="mb-4 ml-4 md:ml-0 text-lg font-semibold">Értékelés:</p>
                                                         <div class="flex flex-row justify-center items-center gap-2 mb-4">
                                                             <For each={[1, 2, 3, 4, 5]}>

@@ -57,15 +57,22 @@ export default function BlogManager() {
             {
                 blogposts() && blogposts().length > 0 ?
             <For each={blogposts()}>
-                {(blogpost) => (
+                {(blogpost) => {
+                    const formattedDate = new Date(blogpost.date).toLocaleDateString("hu-HU", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric"
+                    });
+                    return (
                     <BlogPostBar
                         id={blogpost.id}
                         title={blogpost.title}
-                        date={blogpost.date}
+                        date={formattedDate}
                         post={blogpost.post}
                         refreshBlogposts={refetch}
                         ></BlogPostBar>
                     )
+                }
                 }
             </For>
             :

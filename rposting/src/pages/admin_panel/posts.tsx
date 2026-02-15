@@ -101,7 +101,7 @@ export default function Main() {
                                 {(fight) => (
                                         <div class="flex flex-col rounded-lg shadow-lg bg-white p-4 w-[90%] min-w-[300px] md:w-[60%] md:min-w-[400px] mb-6">
                                                 <h3 class="text-xl font-semibold mb-3">{fight.title}</h3>
-                                                <p class="mb-2"><img src={"http://127.0.0.1:8000/"+fight.image_source}></img></p>
+                                                <p class="mb-2"><img src={`${import.meta.env.VITE_API_URL}${fight.image_source}`} class="md:rounded-lg md:shadow-lg w-full h-auto mb-1"></img></p>
                                                 <div class="flex flex-row justify-between items-center">
                                                     <button class="bg-red-700 text-white rounded-lg shadow-lg hover:bg-red-800 p-2 mt-4 w-full" onclick={() => deletePost(fight.id)}>Törlés</button>
                                                 </div>

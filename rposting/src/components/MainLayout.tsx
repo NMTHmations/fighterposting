@@ -46,9 +46,9 @@ export default function MainLayout(props: MainLayoutProps) {
                             </a>
                             </div>
                             <div class="mr-2">
-                                <a href="/what-is-this">
+                                <a href="/blog">
                             <button class="text-white px-4 py-2 hover:text-[#ff6004] hover:underline hover:decoration-3 hover:underline-offset-4">
-                                Mi ez?
+                                Blog
                             </button>
                             </a>
                             </div>
@@ -86,9 +86,9 @@ export default function MainLayout(props: MainLayoutProps) {
                                 Küldj be harcot
                             </button>
                             </a>
-                            <a href="/what-is-this">
+                            <a href="/blog">
                                 <button class="text-white px-4 py-2 hover:text-[#ff6004] hover:underline hover:decoration-3 hover:underline-offset-4">
-                                    Mi ez?
+                                    Blog
                                 </button>
                             </a>
                         </div>
@@ -101,6 +101,14 @@ export default function MainLayout(props: MainLayoutProps) {
                 <div class="bg-[#30383d] w-full h-16 flex items-center w-screen">
                     <div class="md:mr-[20%] md:ml-[20%] p-2 flex flex-row w-full items-center">
                         <p class="text-white pl-5">Copyright &#169; {new Date().getFullYear()} FighterPosting</p>
+                    </div>
+                    <div class="grow"></div>{/* this fills the space */}
+                    <div class="flex justify-end items-center min-w-20 md:mr-[20%]">
+                        <a href="/what-is-this">
+                            <button class="text-white px-4 py-2 hover:text-[#ff6004] hover:underline hover:decoration-3 hover:underline-offset-4">
+                                Mi ez?
+                            </button>
+                        </a>
                     </div>
                 </div>
         </div>

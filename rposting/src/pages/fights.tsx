@@ -65,7 +65,7 @@ export default function Main() {
                                                     <>
                                         <Plate type="fight">
                                                 <a href={`/fight/${fight.id}`}><h3 class="text-xl font-semibold m-4 md:m-0 md:mb-3">{fight.title}</h3></a>
-                                                <p class="mb-2"><a href={`/fight/${fight.id}`}><img src={"http://127.0.0.1:8000/" + fight.image_source} class="md:rounded-lg md:shadow-lg w-full h-auto mb-1"></img></a></p>
+                                                <p class="mb-2"><a href={`/fight/${fight.id}`}><img src={`${import.meta.env.VITE_API_URL}${fight.image_source}`} class="md:rounded-lg md:shadow-lg w-full h-auto mb-1"></img></a></p>
                                                 <div class="flex flex-row items-center gap-x-2 mb-2">
                                                     <img src={orange} class="w-[10%]" />
                                                     <p class="text-gray-700 text-xl font-bold">{fight.starAvg}/5</p>

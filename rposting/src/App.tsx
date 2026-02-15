@@ -16,11 +16,15 @@ const SMSs = lazy(() => import('./pages/hkposts'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const SMSManager = lazy(() => import('./pages/admin_panel/SMS'));
 const Blogposts = lazy(() => import('./pages/admin_panel/blogposts'));
+const messages = lazy(() => import('./pages/messages'));
+const Blog = lazy(() => import('./pages/blogposts'));
+const BlogPost = lazy(() => import('./pages/blogpost'));
 
 export default function App() {
   return (
     <Router>
-      <Route path="/" component={Main} />
+      <Route path="/" component={SMSs} />
+      <Route path="/old_index" component={Main} />
       <Route path="/what-is-this" component={what_is_this} />
       <Route path="/upload" component={upload} />
       <Route path="/success" component={success} />
@@ -33,7 +37,9 @@ export default function App() {
       <Route path="/admin/settings" component={Settings} />
       <Route path="/fights" component={fights} />
       <Route path="/fight/:slug" component={fight} />
-      <Route path="/SMS" component={SMSs} />
+      <Route path="/messages" component={messages} />
+      <Route path="/blog" component={Blog} />
+      <Route path="/blog/:slug" component={BlogPost} />
       <Route path="/*all" component={NotFound} />
     </Router>
   );

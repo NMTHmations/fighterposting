@@ -680,7 +680,7 @@ class DeleteFighterSMS(APIView):
 @api_view(["GET"])
 def getFighterSMS(request):
     try:
-        fighterSMSmessages = FightClubTextMessages.objects.order_by("-id")
+        fighterSMSmessages = FightClubTextMessages.objects.order_by("date")
         partialList = []
         for SMS in fighterSMSmessages:
             elem = {
@@ -802,7 +802,7 @@ def getBlogPost(request, slug):
             "id": blogpost.id,
             "title": blogpost.title,
             "post": blogpost.post,
-            "date": f"{blogpost.date.year}-{blogpost.date.month}-{blogpost.date.day} {blogpost.date.hour}:{blogpost.date.min}"
+            "date": blogpost.date
         }
         return Response(result,status=status.HTTP_200_OK)
     except:

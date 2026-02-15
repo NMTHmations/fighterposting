@@ -29,7 +29,7 @@ export default function Main() {
                                                 }>
                                                     <Plate type="recommended">
                                                         <h2 class="text-2xl font-bold mb-4 text-center">Ajánlott poszt</h2>
-                                                        <a href={`/fight/${data().id}`}><img src={"http://localhost:8000/" + data().title} alt="Recommended Post" class="md:rounded-lg md:shadow-lg w-full h-auto md:mb-4" /></a>
+                                                        <a href={`/fight/${data().id}`}><img src={`${import.meta.env.VITE_API_URL}${data().title}`} alt="Recommended Post" class="md:rounded-lg md:shadow-lg w-full h-auto md:mb-4" /></a>
                                                     </Plate>
                                                 </Show>
             </div>

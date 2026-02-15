@@ -30,7 +30,7 @@ export default function SMSBar(props: SMSBarProps){
             <p>{props.date}</p>
         </div>
         <div class="w-full p-4 w-[65%]">
-            <p>{props.message}</p>
+            <div class="bg-gray-100 p-4 rounded-lg shadow break-words" innerHTML={props.message}></div>
         </div>
         <div class="w-[10%] p-4 overflow-hidden text-right">
             <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-800" onClick={() => deleteSMS(props.id)}><Trash size={15}/></button>
