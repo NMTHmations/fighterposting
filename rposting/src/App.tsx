@@ -19,6 +19,7 @@ const Blogposts = lazy(() => import('./pages/admin_panel/blogposts'));
 const messages = lazy(() => import('./pages/messages'));
 const Blog = lazy(() => import('./pages/blogposts'));
 const BlogPost = lazy(() => import('./pages/blogpost'));
+const Maintenance = lazy(() => import('./pages/maintenance'));
 
 export default function App() {
   return (

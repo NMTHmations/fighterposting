@@ -1,15 +1,17 @@
+import GecziMenczer from "../../public/menczergeci.jpeg";
+
 interface MessageBubbleProps {
     message: string;
 }
 
 function MessageBubble(props: MessageBubbleProps) {
 
-    const formattedMessage = props.message.replaceAll("<a href=", "<a class=\"text-white-500 hover:underline\" target=\"_blank\" href=");
+    const formattedMessage = props.message.replaceAll("<a href=", "<a class=\"text-white-500 underline hover:text-blue-800\" target=\"_blank\" href=");
 
     return (
 <div class="flex items-end gap-3">
   <img 
-    src="../../public/menczergeci.jpeg" 
+    src={GecziMenczer} 
     alt="profile"
     class="w-10 h-10 rounded-full object-cover"
   />

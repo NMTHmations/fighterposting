@@ -1,4 +1,5 @@
-import { Show, For, createResource, createSignal, createEffect } from "solid-js";
+import { useNavigate } from "@solidjs/router";
+import { Show, For, createResource, createSignal, createEffect, onMount } from "solid-js";
 
 const fetchReviews = async () => {
   const response = await fetch(import.meta.env.VITE_GET_SMS);
@@ -34,6 +35,12 @@ export default function Main() {
   return () => clearInterval(interval);
 });
 
+    const navigate = useNavigate();
+
+    onMount(() => {
+        if (window.outerWidth < 450) navigate("/messages");
+    });
+
     return (
         <>
             <div class="flex flex-col items-center bg-gray-300 justify-center min-h-screen flex-grow w-screen">
@@ -67,7 +74,7 @@ export default function Main() {
                                                     sms.linkType === "FB" || sms.linkType === "Facebook" ?
                                                     <>
                                                     <div class="flex bg-white rounded-lg shadow-lg pt-4 pb-4 md:p-4 mb-6 break-inside-avoid text-center">
-                                                        <div class="w-full max-w-screen overflow-hidden">
+                                                        <div class="w-[350px] overflow-hidden">
                                                             <div class="fb-post" data-href={`${sms.link}`} data-width="350" data-show-text="true"></div>
                                                         </div>
                                                     </div>

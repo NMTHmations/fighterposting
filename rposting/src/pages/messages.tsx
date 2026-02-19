@@ -5,6 +5,8 @@ import { createEffect, createSignal, For, onMount, Show } from "solid-js";
 
 export default function Messages() {
     const [messages, setMessages] = createSignal([]);
+
+    let chatRef: HTMLDivElement | undefined; // ref to the scroll container
     
     const fetchDates = async () => {
         const response = await fetch(import.meta.env.VITE_API_URL + `fighter/sms/`);
@@ -21,10 +23,20 @@ export default function Messages() {
         fetchDates();
     });
 
+    // Scroll to bottom whenever messages change
+  createEffect(() => {
+    if (chatRef && messages().length > 0) {
+      // Scroll to bottom after next DOM update
+      requestAnimationFrame(() => {
+        chatRef!.scrollTop = chatRef!.scrollHeight;
+      });
+    }
+  });
+
 
     return (
         <MessageHeader>
-            <div class="flex flex-col flex-grow w-full max-w-screen p-4">
+            <div ref={chatRef} class="flex flex-col flex-grow w-full max-w-screen p-4 overflow-y-auto h-[500px]">
                 <Show when={messages().length > 0} fallback={<p>Loading...</p>}>
                     <For each={messages()}>
                         {(message, index) => {
