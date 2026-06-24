@@ -73,7 +73,9 @@ urlpatterns = [
     path('blogposts/add/',views.AddBlogPost.as_view(),name="add-blog-post"),
     path('blogposts/<slug:slug>',views.getBlogPost,name="get-blog-post"),
     path('blogposts/delete/<slug:slug>',views.DeleteBlogPost.as_view(),name="delete-blog-post"),
-    path('blogposts/modify/<slug:slug>',views.ModifyBlogPost.as_view(),name="modify-blog-post")
+    path('blogposts/modify/<slug:slug>',views.ModifyBlogPost.as_view(),name="modify-blog-post"),
+    path('sender/create/',views.CreateSMSSender.as_view(),name="create-sender"),
+    path('sender/',views.getSMSSenders.as_view(),name="get-senders")
 ]
 
 if settings.DEBUG:  # Only for development

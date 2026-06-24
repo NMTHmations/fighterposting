@@ -2,7 +2,7 @@ import random
 from django.shortcuts import render
 from rest_framework.request import Request
 from rest_framework.response import Response
-from .models import ReviewPost, ActivePost, DeviceHandler, FightClubTextMessages, BlogPosts
+from .models import ReviewPost, ActivePost, DeviceHandler, FightClubTextMessages, BlogPosts, SenderData
 from django.http import JsonResponse
 import json
 from rest_framework.decorators import api_view
@@ -548,7 +548,7 @@ class EdgeToolTokenGet(APIView):
             except:
                 return Response({'message':'Device not found!'},status=status.HTTP_404_NOT_FOUND)
         except:
-            return Response({'message':'Unexpected server error happened during query'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'message':f'Unexpected server error happened during query'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class EdgeToolTokenGetAll(APIView):
     permission_classes = [IsAuthenticated]
@@ -587,25 +587,28 @@ def CronAddSocialRaid(request):
         KEYS = dotenv_values()
         
         private_key_bytes = None
+        public_key_bytes = None
         
         with open(KEYS["PRIVATE_KEY"],"rb") as file:
             private_key_bytes = file.read()
         
+        with open(KEYS["PUBLIC_KEY"],"rb") as file:
+            public_key_bytes = file.read()
+        
         token = auth[7:]
         
-        payload = jwt.decode(token,private_key_bytes,["HS256"],options={
+        payload = jwt.decode(token,key=public_key_bytes,algorithms=["RS256"],options={
             "require": ["ttl","token"]
         })
-        tokens = DeviceHandler.objects.all()
+        ttl = datetime.datetime.strptime(payload["ttl"],'%Y-%m-%d').date()
+        devices = DeviceHandler.objects.filter(TTL=ttl)
         found = False
-        decodedToken = decrypt_message(payload["token"],private_key_bytes)
-        for token in tokens:
-            if token.devicePAT == payload["token"] and decrypt_message(token.devicePAT,private_key_bytes) == decodedToken and token.TTL == payload["ttl"]:
+        for device in devices:
+            if decrypt_message(device.devicePAT,private_key_bytes) == payload["token"]:
                 found = True
                 break
         if found == False:
             return Response({'message':'Token is not found!'},status=status.HTTP_404_NOT_FOUND)
-        ttl = datetime.datetime.strptime(payload["ttl"],'%Y-%m-%d')
         if datetime.datetime.now().date() > ttl:
             return Response({'message':'Token expired!'},status=status.HTTP_400_BAD_REQUEST)
         try:
@@ -617,9 +620,11 @@ def CronAddSocialRaid(request):
             fightSMS.save()
             return Response({'message':'SMS message added!'},status=status.HTTP_200_OK)
         except:
-            return Response({'message':'Bad or missing requests!'},status=status.HTTP_400_BAD_REQUEST)
+            error_msg = traceback.format_exc()
+            return Response({'message':f'Bad or missing requests! {error_msg}'},status=status.HTTP_400_BAD_REQUEST)
     except:
-        return Response({'message':'Unexpected server error happened during social post raid addition'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        error_msg = traceback.format_exc()
+        return Response({'message':f'Unexpected server error happened during social post raid addition: {error_msg}'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class CreateFighterSMS(APIView):
     permission_classes = [IsAuthenticated]
@@ -649,6 +654,11 @@ class CreateFighterSMS(APIView):
                         'type': 'string',
                         'description': 'Link for the post',
                         'default': 'https://www.facebook.com/share/p/183qXeAYvN/?mibextid=wwXIfr'
+                    },
+                    'senderId': {
+                        'type': 'int',
+                        'description': 'The identification number of the sender',
+                        'default': '1'
                     }
                 },
                 'required': ['message','date','type','link']
@@ -662,11 +672,81 @@ class CreateFighterSMS(APIView):
             link = str(request.data.get("link"))
             type = str(request.data.get("type"))
             date = datetime.datetime.strptime(request.data.get("date"),'%Y-%m-%d')
-            fightSMS = FightClubTextMessages(date=date,message=message,socialPostType=type,socialUrl=link)
+            sender = None
+            senderId = int(request.data.get("senderId"))
+            if senderId:
+                sender = SenderData().objects.get(id=senderId)
+            fightSMS = FightClubTextMessages(date=date,message=message,socialPostType=type,socialUrl=link, sender = sender)
             fightSMS.save()
             return Response({'message':'SMS message added!'},status=status.HTTP_200_OK)
         except:
             return Response({'message':'Bad or missing requests!'},status=status.HTTP_400_BAD_REQUEST)
+
+## TO-DO: implement sender creation
+
+class CreateSMSSender(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (MultiPartParser, FormParser)
+    
+    @extend_schema(
+        request={
+            'multipart/form-data': {
+                'type': 'object',
+                'properties': {
+                    'name': {
+                        'type': 'string',
+                        'description': 'PBX device name',
+                        'default': 'PBX test'
+                    },
+                    'file': {
+                        'type': 'string',
+                        'format': 'binary',
+                        'description': 'Image file (jpg, png, gif)'
+                    }
+                },
+                'required': ['name']
+            }
+        },
+        responses={200: OpenApiResponse(description='Token created!')}
+    )
+    def post(self, request):
+        try:
+            data = request.data.get("name")
+            if not data:
+                print("missing:data")
+                return Response({'result':'Invalid request'},status=status.HTTP_400_BAD_REQUEST)
+            if "file" not in request.FILES:
+                print("missing:file")
+                return Response({'Message': 'No file provided'},status=status.HTTP_400_BAD_REQUEST)
+            file_obj = request.FILES["file"]
+            file_extension = file_obj.name.split('.')[-1].lower()
+            if file_extension not in ['jpg','jpeg','png','gif']:
+                return JsonResponse({'Response': 400, 'Message': 'Invalid file format, only jpg,png or gif allowed'})
+            newSender = SenderData(name=data, photo=file_obj)
+            newSender.save()
+            return Response({'message':'SMS message added!'},status=status.HTTP_200_OK)
+        except:
+            return Response({'message':'Bad or missing requests!'},status=status.HTTP_400_BAD_REQUEST)
+        
+
+class getSMSSenders(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self,request):
+        try:
+            listOfSenders = []
+            senders = SenderData.objects.all()
+            for sender in senders:
+                element = {
+                    "name": sender.name,
+                    "fileUrl": sender.photo.url
+                }
+                listOfSenders.append(element)
+            result = json.dumps(listOfSenders,ensure_ascii=False,default=str)
+            return JsonResponse(result,safe=False)
+        except Exception as e:
+            error_details = traceback.format_exc()
+            return JsonResponse({"error": error_details}, safe=False)
+
 
 class DeleteFighterSMS(APIView):
     def delete(self, request,slug):
@@ -688,12 +768,14 @@ def getFighterSMS(request):
                 "message": SMS.message,
                 "date": f"{SMS.date.year}-{SMS.date.month}-{SMS.date.day}",
                 "linkType": SMS.socialPostType,
-                "link": SMS.socialUrl
+                "link": SMS.socialUrl,
+                "senderId": SMS.sender.id if SMS.sender != None else None
             }
             partialList.append(elem)
         return Response(partialList,status=status.HTTP_200_OK)
-    except:
-        return Response({'message':'Error happened!'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except Exception as e:
+        error_details = traceback.format_exc()
+        return Response({'message':error_details},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class AddBlogPost(APIView):
     permission_classes = [IsAuthenticated]

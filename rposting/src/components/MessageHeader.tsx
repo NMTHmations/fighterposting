@@ -37,7 +37,7 @@ export default function MessageHeader(props: MessageHeaderProps) {
                     HK
                 </p>
                 <p class="text-gray-400 ml-2 text-[12px] mr-3">
-                    Büdösszájú Menczer
+                    Menczer Tompika
                 </p>
                 </div>
                 </div>

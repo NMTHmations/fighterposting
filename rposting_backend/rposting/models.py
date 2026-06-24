@@ -38,6 +38,14 @@ class DeviceHandler(models.Model):
     devicePAT = models.TextField(null=False,max_length=3000)
     TTL = models.DateField(default=now().date())
 
+class SenderData(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.TextField(null=False,max_length=3000)
+    photo = models.FileField(upload_to=user_directory_path,null=True,validators=[FileExtensionValidator(['jpg','png','jpeg','gif','webm'])])
+    
+    def __str__(self):
+        return self.name
+
 class FightClubTextMessages(models.Model):
     id = models.AutoField(primary_key=True)
     date = models.DateField(null=False)
@@ -50,6 +58,7 @@ class FightClubTextMessages(models.Model):
         "TH": "Threads",
         "X": "X"})
     socialUrl = models.TextField(null=False,max_length=3000)
+    sender = models.ForeignKey(SenderData, on_delete=models.CASCADE, null=True)
 
 class ReviewPost(models.Model):
     id = models.AutoField(primary_key=True)

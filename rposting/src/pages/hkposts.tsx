@@ -71,7 +71,7 @@ export default function Main() {
                                     <div class="columns-1 md:columns-1 lg:columns-2 mb-6">
                                     <For each={data()}>
                                                 {(sms) => (
-                                                    sms.linkType === "FB" || sms.linkType === "Facebook" ?
+                                                    (sms.linkType === "FB" || sms.linkType === "Facebook") && sms.link !== "None" ?
                                                     <>
                                                     <div class="flex bg-white rounded-lg shadow-lg pt-4 pb-4 md:p-4 mb-6 break-inside-avoid text-center">
                                                         <div class="w-[350px] overflow-hidden">
