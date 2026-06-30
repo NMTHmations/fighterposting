@@ -730,13 +730,13 @@ class CreateSMSSender(APIView):
         
 
 class getSMSSenders(APIView):
-    permission_classes = [IsAuthenticated]
     def get(self,request):
         try:
             listOfSenders = []
             senders = SenderData.objects.all()
             for sender in senders:
                 element = {
+                    "id": sender.id,
                     "name": sender.name,
                     "fileUrl": sender.photo.url
                 }

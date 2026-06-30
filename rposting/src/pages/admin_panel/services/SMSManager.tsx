@@ -1,7 +1,13 @@
 import { createEffect, createSignal } from "solid-js";
 import SMSBar from "../../../components/SMSBar";
 import ModalWindow from "../../../components/ModalWindow";
-import { Plus, User, ImageIcon, XIcon } from "lucide-solid";
+import { Plus, User, ImageIcon, XIcon, Trash } from "lucide-solid";
+
+interface PropagandistProperties {
+    id: number,
+    name: string,
+    fileUrl: string | null
+}
 
 export default function SMSManager() {
 
@@ -12,6 +18,8 @@ export default function SMSManager() {
     const [getFile, setFile] = createSignal<File | null>(null);
     const [imageSrc, setImageSrc] = createSignal<string | null>(null);
     const [uploaded, setUploaded] = createSignal(false);
+    const [PropagandistList, setPropagandistList] = createSignal<PropagandistProperties[]>([]);
+    const [selectedPropagandists, selectPropagandist] = createSignal<PropagandistProperties[]>([]);
 
     const handleFileChange = (event: Event) => {
         const target = event.target as HTMLInputElement;
@@ -48,6 +56,60 @@ export default function SMSManager() {
         setFile(null);
         setImageSrc(null)
         setUploaded(false);
+    }
+
+    const createPropagandist = async () => {
+        const formData = new FormData();
+        const name = (document.getElementById("propagandistName") as HTMLInputElement).value;
+        formData.append("name", name);
+        formData.append("file", getFile()!);
+        fetch(import.meta.env.VITE_API_URL + `sender/create/`, {
+            method: "POST",
+            credentials: "include",
+            body: formData
+        }).then((res) => {
+            if (res.ok)
+            {
+                removeUpload();
+                setPropagandist(false);
+                fetchPropagandists();
+            }
+            else
+            {
+                console.log("Hiba történt!");
+            }
+        }).catch((error) => {
+            console.error(error);
+        });
+    }
+
+    const fetchPropagandists = async () => {
+        fetch(import.meta.env.VITE_API_URL + `sender/`, {
+                method: "GET",
+                credentials: "include"
+            }
+        ).then((res) => {
+            if (res.ok)
+            {
+                console.log("Propagandists fetched")
+                return res.json();
+            }
+            return null;
+        }).then((results) => {
+            const data = JSON.parse(results)
+            if (data && Array.isArray(data))
+            {
+                const propagandists: PropagandistProperties[] = data.map((result: any) => ({
+                    id: result.id ?? null,
+                    name: result.name,
+                    fileUrl: result.fileUrl ?? null,
+                }));
+                setPropagandistList(propagandists);
+                console.log(propagandists);
+            }
+        }).catch((error) => {
+            console.error(error);
+        });
     }
 
     const getAllSMS = async () => {
@@ -110,6 +172,7 @@ export default function SMSManager() {
         if (isRefetch())
         {
             setIsRefetch(false);
+            fetchPropagandists();
             getAllSMS();
         }
     });
@@ -118,7 +181,19 @@ export default function SMSManager() {
     return (
         <div>
             <h1 class="text-2xl font-bold mb-4">SMS Kezelő</h1>
-            <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800 mt-4" onClick={() => setPropagandist(true)}><Plus/></button>
+            <h2 class="text-xl mt-2">Propagandisták</h2>
+            <div class="flex flex-row">
+                {
+                    PropagandistList().map(element => (
+                        <>
+                            <button class="bg-blue-600 text-white px-4 py-2 rounded-l-lg hover:bg-blue-800 mt-2">{element.name}</button>
+                            <button class="bg-red-600 text-white px-2 py-2 rounded-r-lg hover:bg-red-800 mt-2 mr-2"><Trash/></button>
+                        </>
+                    ))
+                }
+                <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800 mt-2" onClick={() => setPropagandist(true)}><Plus/></button>
+            </div>
+            <h2 class="text-xl mt-2">SMS-ek</h2>
             {SMSList().length > 0 ?
             SMSList().map((sms) => (
                 <SMSBar id={sms.id} date={sms.date} message={sms.message} setIsRefetch={setIsRefetch}/>
@@ -167,8 +242,8 @@ export default function SMSManager() {
                     <p class="mb-4">Propagandista fotója:</p>
                     { uploaded() == false ? 
                     <>
-                    <input type="file" id="file-upload" class="hidden" onChange={handleFileChange}/>
-                    <label for="file-upload" class="inline-block mb-2 w-full rounded bg-[#ff6004] shadow-md text-white text-center p-2 hover:shadow-sm hover:bg-[#df5200]">Kép feltöltése</label>
+                    <input type="file" id="file-upload-propagandist" class="hidden" onChange={handleFileChange}/>
+                    <label for="file-upload-propagandist" class="inline-block mb-2 w-full rounded bg-[#ff6004] shadow-md text-white text-center p-2 hover:shadow-sm hover:bg-[#df5200]">Kép feltöltése</label>
                     </>
                     :
                     <div class="flex flex-row">
@@ -179,7 +254,7 @@ export default function SMSManager() {
                 </div>
                 </div>
                 <div class="w-full flex justify-start">
-                    <button class="mb-2 rounded bg-[#ff6004] shadow-md text-white text-center p-2 hover:shadow-sm hover:bg-[#df5200]">Mentés</button>
+                    <button class="mb-2 rounded bg-[#ff6004] shadow-md text-white text-center p-2 hover:shadow-sm hover:bg-[#df5200]" onclick={() => createPropagandist()}>Mentés</button>
                 </div>
             </ModalWindow>
             :
