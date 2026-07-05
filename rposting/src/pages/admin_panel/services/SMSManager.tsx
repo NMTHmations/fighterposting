@@ -2,16 +2,20 @@ import { createEffect, createSignal } from "solid-js";
 import SMSBar from "../../../components/SMSBar";
 import ModalWindow from "../../../components/ModalWindow";
 import { Plus, User, ImageIcon, XIcon, Trash } from "lucide-solid";
+import { PropagandistProperties } from "../../../interfaces/propagandistInterface";
 
-interface PropagandistProperties {
+interface SMSProperties {
     id: number,
-    name: string,
-    fileUrl: string | null
+    date: string,
+    message: string,
+    link: string,
+    linkType: string,
+    senderId: number
 }
 
 export default function SMSManager() {
 
-    const [SMSList, setSMSList] = createSignal<Array<{id: number, date: string, message: string}>>([]);
+    const [SMSList, setSMSList] = createSignal<SMSProperties[]>([]);
     const [isRefetch, setIsRefetch] = createSignal(true);
     const [showWindow, setShowWindow] = createSignal(false);
     const [Propagandist, setPropagandist] = createSignal(false);
@@ -19,7 +23,8 @@ export default function SMSManager() {
     const [imageSrc, setImageSrc] = createSignal<string | null>(null);
     const [uploaded, setUploaded] = createSignal(false);
     const [PropagandistList, setPropagandistList] = createSignal<PropagandistProperties[]>([]);
-    const [selectedPropagandists, selectPropagandist] = createSignal<PropagandistProperties[]>([]);
+    const [selectedPropagandists, selectPropagandists] = createSignal<number[]>([]);
+    const [SMSToEdit, setSMSToEdit] = createSignal<SMSProperties | null>(null);
 
     const handleFileChange = (event: Event) => {
         const target = event.target as HTMLInputElement;
@@ -51,6 +56,27 @@ export default function SMSManager() {
             setUploaded(false);
         }
     };
+
+    const deletePropagandist = async (id: number) => {
+        fetch(import.meta.env.VITE_API_URL + `sender/delete/${id}/`, {
+            method: "DELETE",
+            credentials: "include",
+        }).then(
+            (res) =>
+            {
+                if (res.ok)
+                {
+                    console.log("Propagandist deleted!");
+                    fetchPropagandists();
+                }
+                else {
+                    console.log("Propagandist could not be deleted!");
+                }
+            }
+        ).catch((error) => {
+            console.log(error)
+        })
+    }
 
     const removeUpload = () => {
         setFile(null);
@@ -112,6 +138,16 @@ export default function SMSManager() {
         });
     }
 
+    const selectPropagandistHandler = (id: number) => {
+        const currentSelection = selectedPropagandists();
+        if (currentSelection.includes(id)) {
+            selectPropagandists(currentSelection.filter(selectedId => selectedId !== id));
+        } else {
+            selectPropagandists([...currentSelection, id]);
+        }
+        getAllSMS();
+    }
+
     const getAllSMS = async () => {
         const response = await fetch(import.meta.env.VITE_API_URL + `fighter/sms/`, {
             method: "GET",
@@ -133,6 +169,7 @@ export default function SMSManager() {
             const postLink = (document.getElementById("postLink") as HTMLInputElement).value;
             const postType = (document.getElementById("postType") as HTMLInputElement).value;
             const postDate = (document.getElementById("postDate") as HTMLInputElement).value;
+            const propagandist = (document.getElementById("sender") as HTMLInputElement).value;
             if (!message || message.trim() === "") {
                 alert("Az üzenet mező nem lehet üres.");
                 return;
@@ -150,6 +187,10 @@ export default function SMSManager() {
             formData.append("message", message);
             formData.append("link", postLink);
             formData.append("type", postType);
+            if (propagandist !== "none")
+            {
+                formData.append("senderId",propagandist);
+            }
             console.log(formData.get("message"));
             console.log(formData.get("link"));
             console.log(formData.get("date"));
@@ -167,6 +208,27 @@ export default function SMSManager() {
                 alert("SMS-ek hozzáadása sikertelen");
             }
         };
+    
+    const editSMS = async (id: number) => {
+        const smsToEdit = SMSList().find(sms => sms.id === id);
+        if (smsToEdit) {
+            setSMSToEdit(smsToEdit);
+            setShowWindow(true);
+            (document.getElementById("smsMessage") as HTMLInputElement).value = smsToEdit.message;
+            (document.getElementById("postLink") as HTMLInputElement).value = smsToEdit.link;
+            (document.getElementById("postType") as HTMLInputElement).value = smsToEdit.linkType;
+            (document.getElementById("postDate") as HTMLInputElement).value = new Date(smsToEdit.date).toISOString().split('T')[0];
+            (document.getElementById("sender") as HTMLInputElement).value = smsToEdit.senderId as unknown as string;
+        } else {
+            alert("SMS not found for editing.");
+        }
+    };
+
+    const closeEditWindow = () => {
+        setSMSToEdit(null);
+        setShowWindow(false);
+    };
+
 
     createEffect(() => {
         if (isRefetch())
@@ -177,17 +239,72 @@ export default function SMSManager() {
         }
     });
 
+    const modifySMS = async () => {
+        const formData = new FormData();
+        const message = (document.getElementById("smsMessage") as HTMLInputElement).value;
+        const postLink = (document.getElementById("postLink") as HTMLInputElement).value;
+        const postType = (document.getElementById("postType") as HTMLInputElement).value;
+        const postDate = (document.getElementById("postDate") as HTMLInputElement).value;
+        const propagandist = (document.getElementById("sender") as HTMLInputElement).value;
+        if (!message || message.trim() === "") {
+            alert("Az üzenet mező nem lehet üres.");
+            return;
+        }
+        if (!postLink || postLink.trim() === "") {
+            alert("A poszt link mező nem lehet üres.");
+            return;
+        }
+        if (!postType || postType.trim() === "") {
+            alert("A poszt típus mező nem lehet üres.");
+            return;
+        }
+        const now = Date.now();
+        formData.append("date", postDate || `${new Date(now).getFullYear()}-${(new Date(now).getMonth()+1).toString().padStart(2, '0')}-${new Date(now).getDate().toString().padStart(2, '0')}`);
+        formData.append("message", message);
+        formData.append("link", postLink);
+        formData.append("type", postType);
+        if (propagandist !== "none")
+        {
+            formData.append("senderId",propagandist);
+        }
+        console.log(formData.get("message"));
+        console.log(formData.get("link"));
+        console.log(formData.get("date"));
+        console.log(formData.get("type"));
+        const response = await fetch(import.meta.env.VITE_API_URL + `fighter/sms/modify/${SMSToEdit()?.id}/`, {
+            method: "PATCH",
+            credentials: "include",
+            body: formData,
+        });
+        if (response.ok) {
+            alert("SMS-ek sikeresen módosítva");
+            setIsRefetch(true);
+            setShowWindow(false);
+            setSMSToEdit(null);
+        } else {
+            alert("SMS-ek módosítása sikertelen");
+        }
+    }
+
 
     return (
         <div>
             <h1 class="text-2xl font-bold mb-4">SMS Kezelő</h1>
             <h2 class="text-xl mt-2">Propagandisták</h2>
-            <div class="flex flex-row">
+            <div class="flex flex-row flex-wrap">
                 {
                     PropagandistList().map(element => (
                         <>
-                            <button class="bg-blue-600 text-white px-4 py-2 rounded-l-lg hover:bg-blue-800 mt-2">{element.name}</button>
-                            <button class="bg-red-600 text-white px-2 py-2 rounded-r-lg hover:bg-red-800 mt-2 mr-2"><Trash/></button>
+                            {selectedPropagandists().includes(element.id) ?
+                            <button class="bg-blue-600 text-white px-4 py-2 rounded-l-lg hover:bg-blue-800 mt-2" onClick={() => selectPropagandistHandler(element.id)}>
+                                {element.name}
+                            </button>
+                            :
+                            <button class="bg-gray-600 text-white px-4 py-2 rounded-l-lg hover:bg-gray-800 mt-2" onClick={() => selectPropagandistHandler(element.id)}>
+                                {element.name}
+                            </button>
+                            }
+                            <button class="bg-red-600 text-white px-2 py-2 rounded-r-lg hover:bg-red-800 mt-2 mr-2" onclick={() => deletePropagandist(element.id)}><Trash/></button>
                         </>
                     ))
                 }
@@ -196,14 +313,22 @@ export default function SMSManager() {
             <h2 class="text-xl mt-2">SMS-ek</h2>
             {SMSList().length > 0 ?
             SMSList().map((sms) => (
-                <SMSBar id={sms.id} date={sms.date} message={sms.message} setIsRefetch={setIsRefetch}/>
-            ))
+                selectedPropagandists().includes(sms.senderId) || selectedPropagandists().length === 0 ? 
+                <SMSBar id={sms.id} date={sms.date} message={sms.message} setIsRefetch={setIsRefetch} openForEdit={editSMS}/>
+                :
+                null
+                )
+            )
         :
         <p class="text-center mt-10 mb-10">Nincs megjeleníthető SMS.</p>}
         <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-800 mt-4" onclick={() => setShowWindow(true)}>SMS-ek hozzáadása</button>
         { showWindow() ?
-        <ModalWindow setOpenAddWindow={setShowWindow}>
+        <ModalWindow setOpenAddWindow={closeEditWindow}>
+            { SMSToEdit() ?
+            <h1 class="text-xl font-bold mb-4">SMS-ek szerkesztése</h1>
+            :
             <h1 class="text-xl font-bold mb-4">SMS-ek hozzáadása</h1>
+            }
             <p>Üzenet</p>
             <textarea class="w-full h-32 p-2 border border-gray-300 rounded mb-4" id="smsMessage"></textarea>
             <p>Poszt link:</p>
@@ -219,9 +344,24 @@ export default function SMSManager() {
                 <option value="YT">YouTube</option>
                 <option value="X">X (Twitter)</option>
             </select>
+            <p>Küldő propagandista:</p>
+            <select id="sender" class="border border-gray-300 rounded-md p-2 w-full mb-4">
+                <option value="none"></option>
+                { PropagandistList().map(
+                    (propagandist) => (
+                        <option value={propagandist.id}>{propagandist.name}</option>
+                    )
+                    )
+                }
+            </select>
+            { SMSToEdit() ?
+            <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800" onclick={async () => {
+                await modifySMS();
+            }}>Módosítás</button>
+            :
             <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800" onclick={async () => {
                 await addSMS();
-            }}>Hozzáadás</button>
+            }}>Hozzáadás</button>}
         </ModalWindow>
         : null }
         {

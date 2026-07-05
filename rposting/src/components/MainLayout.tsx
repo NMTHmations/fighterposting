@@ -38,6 +38,7 @@ export default function MainLayout(props: MainLayoutProps) {
                             </button>
                             </a>
                             </div>
+                            { /*
                             <div class="mr-2">
                                 <a href="/upload">
                             <button class="text-white px-4 py-2 hover:text-[#ff6004] hover:underline hover:decoration-3 hover:underline-offset-4">
@@ -45,6 +46,8 @@ export default function MainLayout(props: MainLayoutProps) {
                             </button>
                             </a>
                             </div>
+                            // We don't want to allow users to upload fights anymore, so it is disabled permanently.
+                            */}
                             <div class="mr-2">
                                 <a href="/blog">
                             <button class="text-white px-4 py-2 hover:text-[#ff6004] hover:underline hover:decoration-3 hover:underline-offset-4">

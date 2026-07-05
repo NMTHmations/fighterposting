@@ -673,16 +673,85 @@ class CreateFighterSMS(APIView):
             type = str(request.data.get("type"))
             date = datetime.datetime.strptime(request.data.get("date"),'%Y-%m-%d')
             sender = None
-            senderId = int(request.data.get("senderId"))
-            if senderId:
-                sender = SenderData().objects.get(id=senderId)
+            senderId = None
+            try:
+                senderId = int(request.data.get("senderId"))
+            except: 
+                senderId = None
+            if senderId != None:
+                sender = SenderData.objects.get(id=senderId)
             fightSMS = FightClubTextMessages(date=date,message=message,socialPostType=type,socialUrl=link, sender = sender)
+            fightSMS.save()
+            return Response({'message':'SMS message added!'},status=status.HTTP_200_OK)
+        except Exception as ex:
+            traceback.print_exc()
+            return Response({'message':'Bad or missing requests!'},status=status.HTTP_400_BAD_REQUEST)
+
+class ModifyFighterSMS(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = (MultiPartParser, FormParser)
+    
+    @extend_schema(
+        request={
+            'multipart/form-data': {
+                'type': 'object',
+                'properties': {
+                    'message': {
+                        'type': 'string',
+                        'description': 'PBX device name',
+                        'default': 'PBX test'
+                    },
+                    'date': {
+                        'type': 'string',
+                        'description': 'Title of post',
+                        'default': '2026-04-12'
+                    },
+                    'type': {
+                        'type': 'string',
+                        'description': 'Social post type and source - Facebook, Tiktok X and etc',
+                        'default': 'FB'
+                    },
+                    'link': {
+                        'type': 'string',
+                        'description': 'Link for the post',
+                        'default': 'https://www.facebook.com/share/p/183qXeAYvN/?mibextid=wwXIfr'
+                    },
+                    'senderId': {
+                        'type': 'int',
+                        'description': 'The identification number of the sender',
+                        'default': '1'
+                    }
+                },
+                'required': ['message','date','type','link']
+            }
+        },
+        responses={200: OpenApiResponse(description='Token created!')}
+    )
+    def patch(self, request, slug):
+        try:
+            id = int(slug)
+            message = str(request.data.get("message"))
+            link = str(request.data.get("link"))
+            type = str(request.data.get("type"))
+            date = datetime.datetime.strptime(request.data.get("date"),'%Y-%m-%d')
+            sender = None
+            senderId = None
+            try: 
+                senderId = int(request.data.get("senderId"))
+            except:
+                senderId = None
+            if senderId != None:
+                sender = SenderData.objects.get(id=senderId)
+            fightSMS = FightClubTextMessages.objects.get(id=id)
+            fightSMS.message = message
+            fightSMS.socialUrl = link
+            fightSMS.socialPostType = type
+            fightSMS.date = date
+            fightSMS.sender = sender
             fightSMS.save()
             return Response({'message':'SMS message added!'},status=status.HTTP_200_OK)
         except:
             return Response({'message':'Bad or missing requests!'},status=status.HTTP_400_BAD_REQUEST)
-
-## TO-DO: implement sender creation
 
 class CreateSMSSender(APIView):
     permission_classes = [IsAuthenticated]
@@ -747,13 +816,24 @@ class getSMSSenders(APIView):
             error_details = traceback.format_exc()
             return JsonResponse({"error": error_details}, safe=False)
 
+class deleteSMSSender(APIView):
+    permission_classes = [IsAuthenticated]
+    def delete(self, request, slug):
+        try:
+            SMSSender = SenderData.objects.get(id=slug)
+            SMSSender.delete()
+            return Response({'message':'SMS sender deleted!'},status=status.HTTP_200_OK)
+        except:
+            return Response({'message':'Bad or missing requests!'},status=status.HTTP_400_BAD_REQUEST)
+
 
 class DeleteFighterSMS(APIView):
+    permission_classes = [IsAuthenticated]
     def delete(self, request,slug):
         try:
             fightSMS = FightClubTextMessages.objects.get(id=slug)
             fightSMS.delete()
-            return Response({'message':'SMS message added!'},status=status.HTTP_200_OK)
+            return Response({'message':'SMS message deleted!'},status=status.HTTP_200_OK)
         except:
             return Response({'message':'Bad or missing requests!'},status=status.HTTP_400_BAD_REQUEST)
 

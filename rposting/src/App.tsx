@@ -27,8 +27,11 @@ export default function App() {
       <Route path="/" component={SMSs} />
       <Route path="/old_index" component={Main} />
       <Route path="/what-is-this" component={what_is_this} />
-      <Route path="/upload" component={upload} />
-      <Route path="/success" component={success} />
+      {
+      //<Route path="/upload" component={upload} />
+      // Uploading fights is disabled permanently, so this route is commented out.
+      //<Route path="/success" component={success} />
+      }
       <Route path="/admin" component={Login} />
       <Route path="/admin/main" component={AdminMain} />
       <Route path="/admin/reviews" component={Reviews} />

@@ -1,7 +1,6 @@
-import GecziMenczer from "../../public/menczergeci.jpeg";
-
 interface MessageBubbleProps {
     message: string;
+    selectedPropagandist: PropagandistProperties | null;
 }
 
 function MessageBubble(props: MessageBubbleProps) {
@@ -11,7 +10,7 @@ function MessageBubble(props: MessageBubbleProps) {
     return (
 <div class="flex items-end gap-3">
   <img 
-    src={GecziMenczer} 
+    src={`${import.meta.env.VITE_API_URL}${props.selectedPropagandist?.fileUrl}`} 
     alt="profile"
     class="w-10 h-10 rounded-full object-cover"
   />

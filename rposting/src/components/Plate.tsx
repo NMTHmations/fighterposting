@@ -8,7 +8,7 @@ interface plateProps {
 export default function Plate(props: plateProps) {
     return (
         props.type === "fight" ?
-        <div class="flex flex-col md:rounded-lg shadow-lg bg-white w-[100%] min-w-[300px] md:w-[60%] md:p-4 md:min-w-[400px] mb-6">
+        <div class="flex flex-col md:rounded-lg shadow-lg bg-white w-[100%] min-w-[800px] md:w-[60%] md:p-4 md:min-w-[800px] mb-6">
             {props.children}
         </div>
         :
