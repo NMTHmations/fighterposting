@@ -1,7 +1,7 @@
 import MessageBubble from "../components/MessageBubble";
 import MessageHeader from "../components/MessageHeader";
 import MessageDivision from "../components/MessageDivision";
-import { createEffect, createSignal, For, onMount, Show } from "solid-js";
+import { createEffect, createSignal, For, on, onMount, Show } from "solid-js";
 import { PropagandistProperties } from "../../../interfaces/propagandistInterface";
 
 interface MessageListItem {
@@ -49,15 +49,31 @@ export default function Messages() {
         fetchDates()
     });
 
-    // Scroll to bottom whenever messages change
-  createEffect(() => {
-    if (chatRef && messages().length > 0) {
-      // Scroll to bottom after next DOM update
-      requestAnimationFrame(() => {
-        chatRef!.scrollTop = chatRef!.scrollHeight;
-      });
+  createEffect(
+    on(actualMessages, () => {
+        requestAnimationFrame(() => {
+            if (chatRef && actualMessages().length > 0) {
+                chatRef.scrollTop = chatRef.scrollHeight;
+            }
+        });
+    })
+);
+
+  const stripHtml = (html: string): string => {
+    if (!html) return "";
+
+    const filtered = html
+        .replace(/<[^>]*>/g, "") // Remove HTML tags
+        .replace(/&nbsp;/g, " ") // Optional: replace non-breaking spaces
+        .replace(/\s+/g, " ")    // Collapse multiple whitespace
+        .trim();
+    
+    if (filtered.length > 80) {
+        return filtered.substring(0, 80) + "...";
     }
-  });
+    return filtered;
+};
+
 
   const retrieveMessageList = async () => {
     console.log("Propagandists:", propagandists());
@@ -78,7 +94,7 @@ export default function Messages() {
   };
 
     return (
-        <MessageHeader selectedPropagandist={selectedPropagandist()} setSelectedPropagandist={setSelectedPropagandist}>
+        <MessageHeader selectedPropagandist={selectedPropagandist()} setSelectedPropagandist={setSelectedPropagandist} resetActualMessages={() => setActualMessages([])}>
             { selectedPropagandist() ?
             <div ref={chatRef} class="flex flex-col flex-grow w-full max-w-screen p-4 overflow-y-auto h-[500px]">
                 <Show when={actualMessages().length > 0} fallback={<p>Loading...</p>}>
@@ -113,7 +129,7 @@ export default function Messages() {
                                         <img src={`${import.meta.env.VITE_API_URL}${item.propagandist.fileUrl}`} alt="Propagandista" class="w-12 h-12 rounded-full" />
                                         <div class="flex flex-col">
                                             <p class="font-bold">{item.propagandist.name}</p>
-                                            <p class="text-gray-600">{item.lastMessage}</p>
+                                            <p class="text-gray-600">{stripHtml(item.lastMessage)}</p>
                                         </div>
                                     </div>
                                 </div>

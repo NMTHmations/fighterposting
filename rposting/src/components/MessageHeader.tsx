@@ -6,12 +6,14 @@ import { PropagandistProperties } from "../../../interfaces/propagandistInterfac
 interface MessageHeaderProps {
     selectedPropagandist: PropagandistProperties | null;
     setSelectedPropagandist: (propagandist: PropagandistProperties | null) => void;
+    resetActualMessages: () => void;
     children: JSX.Element;
 }
 
 export default function MessageHeader(props: MessageHeaderProps) {
     const handleBackClick = () => {
         props.setSelectedPropagandist(null);
+        props.resetActualMessages();
     };
 
     return (
