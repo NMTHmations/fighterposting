@@ -5,7 +5,7 @@ NOTE: This site is no longer maintained! HUNGARIAN below
 
 ## Introduction
 
-The [fighterposting.hu](www.fighterposting.hu) (formerly fighterposting.online) is a collector site of Digital Civic Circles (in Hungarian: Digitális Polgári Körök) and Fighter's Club  (in Hungarian: Harcosok Klubja) Facebook posts and text messages.
+The [fighterposting.hu](https://www.fighterposting.hu) (formerly fighterposting.online) is a collector site of Digital Civic Circles (in Hungarian: Digitális Polgári Körök) and Fighter's Club  (in Hungarian: Harcosok Klubja) Facebook posts and text messages.
 
 ## Usage
 
@@ -20,7 +20,7 @@ The software/service is provided "as is", which means that, you can freely fork 
 
 ## Bemutatás
 
-A [fighterposting.hu](www.fighterposting.hu) (régebben fighterposting.online) egy gyüjtő oldal olyan SMS-eknek és ahhoz Facebook posztoknak, melyek a Digitális Polgári Körökhöz vagy a Harcosok Klubjához kapcsolódnak.
+A [fighterposting.hu]([www.fighterposting.hu](https://www.fighterposting.hu)) (régebben fighterposting.online) egy gyüjtő oldal olyan SMS-eknek és ahhoz Facebook posztoknak, melyek a Digitális Polgári Körökhöz vagy a Harcosok Klubjához kapcsolódnak.
 
 
 ## Használat
